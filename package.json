@@ -1,0 +1,39 @@
+{
+  "name": "wikistxr",
+  "version": "0.1.0",
+  "description": "Lightweight wikitext syntax highlighter library",
+  "type": "module",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/cjs",
+    "dist/esm",
+    "dist/index.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/esm/index.js",
+      "require": "./dist/cjs/index.js",
+      "default": "./dist/esm/index.js"
+    }
+  },
+  "scripts": {
+  "dev": "vite --config vite.config.demo.ts",
+  "build": "tsc --project tsconfig.json && vite build",
+  "build:demo": "vite build --config vite.config.demo.ts",
+  "preview": "vite preview --config vite.config.demo.ts"
+},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/t7ru/wikistxr.git"
+  },
+  "keywords": [
+    "wikitext",
+    "syntax",
+    "highlight",
+    "library"
+  ],
+  "author": "t7ru",
+  "license": "MIT"
+}
