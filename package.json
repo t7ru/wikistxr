@@ -19,11 +19,11 @@
     }
   },
   "scripts": {
-  "dev": "vite --config vite.config.demo.ts",
-  "build": "tsc --project tsconfig.json && vite build",
-  "build:demo": "vite build --config vite.config.demo.ts",
-  "preview": "vite preview --config vite.config.demo.ts"
-},
+    "dev": "vite --config vite.config.demo.ts",
+    "build": "tsc --project tsconfig.json && vite build",
+    "build:demo": "vite build --config vite.config.demo.ts",
+    "preview": "vite preview --config vite.config.demo.ts"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/t7ru/wikistxr.git"
@@ -35,5 +35,9 @@
     "library"
   ],
   "author": "t7ru",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.1.12"
+  }
 }
