@@ -1,151 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>wikistxr - Wikitext Syntax Highlighter</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      padding: 24px;
-      max-width: 1200px;
-      margin: 0 auto;
-      background: #fafafa;
-      color: #222;
-    }
-
-    h1 {
-      margin-bottom: 16px;
-      font-size: 1.6rem;
-    }
-
-    .controls {
-      margin-bottom: .5em;
-      display: flex;
-      flex-wrap: wrap;
-      gap: .75em;
-      align-items: center;
-    }
-
-    .controls select {
-      padding: 8px 14px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1em;
-      background: white;
-      color: #222;
-    }
-
-    .mode-select {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.95em;
-      color: #333;
-    }
-
-    button {
-      padding: 8px 14px;
-      background: #e20c5a;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    button:hover {
-      background: #9e0940;
-      transform: translateY(-1px);
-    }
-
-    .panels {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1em;
-      margin: .5em 0;
-    }
-
-    .panel-header {
-      font-weight: 600;
-      margin-bottom: .375em;
-      font-size: 13px;
-      color: #555;
-    }
-
-    #input, #output {
-      width: 100%;
-      height: 480px;
-      font-family: monospace;
-      font-size: 13px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-
-    #input {
-      resize: vertical;
-    }
-
-    #output {
-      background: #fdfdfd;
-      overflow: auto;
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    #stats {
-      font-size: 12px;
-      color: #666;
-    }
-
-    @media (max-width: 800px) {
-      .panels {
-        grid-template-columns: 1fr;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>wikistxr - Wikitext Syntax Highlighter</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
-    }
-  </style>
-</head>
-<body>
-  <h1>wikistxr - Wikitext Syntax Highlighter</h1>
-  
-  <div class="controls">
-    <button id="btn-basic">Basic</button>
-    <button id="btn-complex">Complex</button>
-    <button id="btn-links">Links</button>
-    <button id="btn-templates">Templates</button>
-    <button id="btn-tables">Tables</button>
-    <button id="btn-tags">Tags</button>
-    <button id="btn-clear">Clear</button>
-    <label class="mode-select">
-      Mode:
-      <select id="mode">
-        <option value="editor">Editor (incremental)</option>
-        <option value="highlighter">Highlighter (full pass)</option>
-      </select>
-    </label>
-  </div>
 
-  <div id="stats"></div>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        padding: 24px;
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #fafafa;
+        color: #222;
+      }
 
-  <div class="panels">
-    <div class="panel">
-      <div class="panel-header">Input (Wikitext)</div>
-      <textarea id="input" placeholder="Enter wikitext here..."></textarea>
+      h1 {
+        margin-bottom: 16px;
+        font-size: 1.6rem;
+      }
+
+      .controls {
+        margin-bottom: 0.5em;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75em;
+        align-items: center;
+      }
+
+      .controls select {
+        padding: 8px 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 1em;
+        background: white;
+        color: #222;
+      }
+
+      .mode-select {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.95em;
+        color: #333;
+      }
+
+      button {
+        padding: 8px 14px;
+        background: #e20c5a;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background 0.2s ease, transform 0.1s ease;
+      }
+
+      button:hover {
+        background: #9e0940;
+        transform: translateY(-1px);
+      }
+
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1em;
+        margin: 0.5em 0;
+      }
+
+      .panel-header {
+        font-weight: 600;
+        margin-bottom: 0.375em;
+        font-size: 13px;
+        color: #555;
+      }
+
+      #input,
+      #output {
+        width: 100%;
+        height: 480px;
+        font-family: monospace;
+        font-size: 13px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      #input {
+        resize: vertical;
+      }
+
+      #output {
+        background: #fdfdfd;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      #stats {
+        font-size: 12px;
+        color: #666;
+      }
+
+      @media (max-width: 800px) {
+        .panels {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>wikistxr, it's fast and lightweight.</h1>
+
+    <div class="controls">
+      <button id="btn-basic">Basic</button>
+      <button id="btn-complex">Complex</button>
+      <button id="btn-links">Links</button>
+      <button id="btn-templates">Templates</button>
+      <button id="btn-tables">Tables</button>
+      <button id="btn-tags">Tags</button>
+      <button id="btn-clear">Clear</button>
+      <label class="mode-select">
+        Mode:
+        <select id="mode">
+          <option value="editor">Editor (incremental)</option>
+          <option value="highlighter">Highlighter (full pass)</option>
+        </select>
+      </label>
     </div>
-    <div class="panel">
-      <div class="panel-header">Output</div>
-      <div id="output"></div>
-    </div>
-  </div>
 
-  <script type="module" src="./main.ts"></script>
-</body>
+    <div id="stats"></div>
+
+    <div class="panels">
+      <div class="panel">
+        <div class="panel-header">Input (Wikitext)</div>
+        <textarea id="input" placeholder="Enter wikitext here..."></textarea>
+      </div>
+      <div class="panel">
+        <div class="panel-header">Output</div>
+        <div id="output"></div>
+      </div>
+    </div>
+
+    <footer
+      style="margin-top: 1em; text-align: center; font-size: 0.9em; color: #666"
+    >
+      <a href="https://github.com/t7ru/wikistxr" target="_blank" rel="noopener"
+        >View on GitHub</a
+      >
+    </footer>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
 </html>

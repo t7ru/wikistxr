@@ -1,7 +1,7 @@
 {
   "name": "wikistxr",
   "version": "0.1.0",
-  "description": "Lightweight wikitext syntax highlighter library",
+  "description": "Lightweight wikitext library for syntax highlighting and editing.",
   "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",

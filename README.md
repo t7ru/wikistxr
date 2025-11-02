@@ -1,5 +1,5 @@
 # wikistxr
-A lightweight and fast library for Wikitext that has a syntax highlighter and editor written in TypeScript. Ships with two modes:
+A lightweight and fast library for **Wiki**text that has a **s**yn**t**a**x** highligh**ter** and edi**tor** written in TypeScript. Ships with two modes:
 
 - **WikitextHighlighter** – full-pass tokenizer + renderer, ideal for static rendering.
 - **WikitextEditor** – incremental highlighter with DOM patching for live editors.
