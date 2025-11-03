@@ -1,4 +1,6 @@
-# wikistxr
+<div align="center"><img src="https://raw.githubusercontent.com/t7ru/wikistxr/refs/heads/main/src/demo/logo.png" width="222" alt="wikistxr logo">
+
+# wikistxr</div>
 A lightweight and fast library for **Wiki**text that has a **s**yn**t**a**x** highligh**ter** and edi**tor** written in TypeScript. Ships with two modes:
 
 - **WikitextHighlighter** – full-pass tokenizer + renderer, ideal for static rendering.
@@ -58,8 +60,11 @@ Run the bundled demo (Vite):
 
 ```bash
 npm install
-npm run build
-npm run preview
+npm run build && npm run preview
+
+# npm run dev only partially works,
+# since the demo uses the built dist
+# instead of src to mimic real usage.
 ```
 
 Open the displayed URL to switch between **Highlighter** and **Editor** modes, load sample snippets, and verify highlighting.

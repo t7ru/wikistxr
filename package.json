@@ -1,6 +1,6 @@
 {
   "name": "wikistxr",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Lightweight wikitext library for syntax highlighting and editing.",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -37,6 +37,7 @@
   "author": "t7ru",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^24.9.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.12"
   }
