@@ -9,7 +9,7 @@ import {
   DEFAULT_URL_PROTOCOLS,
   DEFAULT_REDIRECT_KEYWORDS,
   DEFAULT_EXTENSION_TAGS,
-  CONTENT_PRESERVING_TAGS,
+  DEFAULT_CONTENT_PRESERVING_TAGS,
   DEFAULT_STYLES
 } from './constants';
 import { createSpan } from './utils';
@@ -26,6 +26,7 @@ export class WikitextHighlighter {
   protected urlProtocols: RegExp;
   protected redirectRegex: RegExp;
   protected extensionTags: string[];
+  protected contentPreservingTags: string[];
   protected tokenizer: WikitextTokenizer;
 
   constructor(config: HighlightConfig = {}) {
@@ -36,11 +37,12 @@ export class WikitextHighlighter {
       'i'
     );
     this.extensionTags = config.extensionTags || DEFAULT_EXTENSION_TAGS;
+    this.contentPreservingTags = config.contentPreservingTags || DEFAULT_CONTENT_PRESERVING_TAGS;
     this.tokenizer = new WikitextTokenizer(
       this.urlProtocols,
       this.redirectRegex,
       this.extensionTags,
-      CONTENT_PRESERVING_TAGS
+      this.contentPreservingTags
     );
   }
 

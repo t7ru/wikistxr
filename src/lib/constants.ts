@@ -32,7 +32,7 @@ export const DEFAULT_EXTENSION_TAGS = [
   "source",
 ];
 
-export const CONTENT_PRESERVING_TAGS = [
+export const DEFAULT_CONTENT_PRESERVING_TAGS = [
   "nowiki",
   "pre",
   "syntaxhighlight",
@@ -75,7 +75,7 @@ const generateSectionStyles = () => {
 };
 
 const generateExtensionTagStyles = () => {
-  return CONTENT_PRESERVING_TAGS.map(
+  return DEFAULT_CONTENT_PRESERVING_TAGS.map(
     (tag) => `.wt-ext-${tag} { background-color: ${COLORS.lightGrayBg}; }`
   ).join("\n  ");
 };

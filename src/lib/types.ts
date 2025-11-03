@@ -11,6 +11,7 @@ export interface HighlightConfig {
   urlProtocols?: RegExp;
   redirectKeywords?: string[];
   extensionTags?: string[];
+  contentPreservingTags?: string[];
 }
 
 export interface ClosingResult {

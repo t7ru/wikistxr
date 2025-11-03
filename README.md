@@ -11,7 +11,7 @@ You can find a live demo [here](https://wikistxr.t7ru.link/).
 - Very fast!
 - Easily portable to every modern browser environments.
 - Wikitext-aware tokenization (templates, links, tables, comments, tags, magic words, etc.).
-- Configurable protocols, redirect keywords, and extension tags.
+- Configurable protocols, redirect keywords, extension tags, etc.
 - HTML output with granular CSS classes (`getDefaultStyles()` provided).
 - Incremental mode caches line tokens and state for fast live editing.
 
@@ -48,10 +48,11 @@ document.head.appendChild(styleTag);
 
 ### Configuration
 ```typescript
-const editor = new WikitextEditor({
+const highlighter = new WikitextHighlighter({
   urlProtocols: /^(?:http|https|mailto)/i,
   redirectKeywords: ['REDIRECT', 'RINVIA'],
-  extensionTags: ['nowiki', 'ref', 'gallery']
+  extensionTags: ['nowiki', 'ref', 'gallery'],
+  contentPreservingTags: ['nowiki', 'pre', 'tabber']
 });
 ```
 
