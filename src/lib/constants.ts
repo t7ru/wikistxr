@@ -30,6 +30,7 @@ export const DEFAULT_EXTENSION_TAGS = [
   "noinclude",
   "onlyinclude",
   "gallery",
+  "tabber",
   "syntaxhighlight",
   "source",
   "code",
@@ -41,6 +42,7 @@ export const CONTENT_PRESERVING_TAGS = [
   "syntaxhighlight",
   "source",
   "code",
+  "tabber",
 ];
 
 const COLORS = {

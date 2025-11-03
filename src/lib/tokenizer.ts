@@ -234,7 +234,6 @@ export class WikitextTokenizer {
       }
       // inside templates batch content or handle nested structures
       if (this.templateDepth > 0) {
-        // nested template parameter {{{...}}}
         if (remaining.startsWith('{{{')) {
           flushBuffer();
           let varPos = 0;
@@ -281,7 +280,7 @@ export class WikitextTokenizer {
           flushBuffer();
           const result = findClosing(remaining, '[[', ']]');
           if (result) {
-            tokens.push({ text: result.content, className: '' });
+            tokens.push({ text: result.content, className: 'wt-link-full' });
             pos += result.content.length;
             continue;
           }
@@ -291,12 +290,20 @@ export class WikitextTokenizer {
           flushBuffer();
           const result = findClosing(remaining, '{{', '}}');
           if (result) {
-            tokens.push({ text: result.content, className: '' });
+            tokens.push({ text: result.content, className: 'wt-template-full' });
             pos += result.content.length;
             continue;
           }
         }
-        // Batch template content
+
+        const parsedToken = this.parseToken(remaining);
+        if (parsedToken) {
+          flushBuffer();
+          tokens.push(parsedToken);
+          pos += parsedToken.text.length;
+          continue;
+        }
+
         buffer += line[pos];
         bufferClass = 'wt-template';
         pos++;
