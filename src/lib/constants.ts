@@ -26,14 +26,10 @@ export const DEFAULT_EXTENSION_TAGS = [
   "ref",
   "references",
   "poem",
-  "includeonly",
-  "noinclude",
-  "onlyinclude",
   "gallery",
   "tabber",
   "syntaxhighlight",
   "source",
-  "code",
 ];
 
 export const CONTENT_PRESERVING_TAGS = [
