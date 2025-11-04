@@ -240,7 +240,8 @@ function setMode(mode: "editor" | "highlighter") {
   if (mode === "editor") {
     document.body.classList.add("editor-mode");
     if (inputPanel) inputPanel.style.display = "none";
-    statsElement.innerHTML = '✗ <strong>Editor mode is experimental.</strong> Use "Highlighter" mode for stable and reliable production use cases.';
+    statsElement.innerHTML =
+      '✗ <strong>Editor mode is experimental.</strong> Use "Highlighter" mode for stable and reliable production use cases.';
 
     outputElement.contentEditable = "true";
     editorHighlighter.resetCache();

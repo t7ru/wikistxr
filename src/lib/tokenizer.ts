@@ -55,6 +55,7 @@ export class WikitextTokenizer {
         bufferClass = "";
       }
     };
+    let inTableRow = false;
 
     // Multiline extension tag continuation
     if (this.inExtensionTag) {
@@ -84,11 +85,10 @@ export class WikitextTokenizer {
     if (this.inMultilineComment) {
       const commentEnd = line.indexOf("-->");
       if (commentEnd > -1) {
-        const beforeClose = line.slice(0, commentEnd);
-        if (beforeClose) {
-          tokens.push({ text: beforeClose, className: "wt-comment" });
+        const commentText = line.slice(0, commentEnd + 3);
+        if (commentText) {
+          tokens.push({ text: commentText, className: "wt-comment" });
         }
-        tokens.push({ text: "-->", className: "wt-comment" });
         this.inMultilineComment = false;
         this.commentBuffer = "";
         pos = commentEnd + 3;
@@ -185,6 +185,7 @@ export class WikitextTokenizer {
       }
       // Table header !
       if (line.startsWith("!")) {
+        inTableRow = true;
         tokens.push({ text: "!", className: "wt-table-header" });
         pos = 1;
         const pipeIdx = line.indexOf("|", pos);
@@ -199,6 +200,7 @@ export class WikitextTokenizer {
       }
       // Table cell |
       else if (line.startsWith("|")) {
+        inTableRow = true;
         tokens.push({ text: "|", className: "wt-table-cell" });
         pos = 1;
         const pipeIdx = line.indexOf("|", pos);
@@ -220,23 +222,34 @@ export class WikitextTokenizer {
       // HTML comments
       if (remaining.startsWith("<!--")) {
         flushBuffer();
-        const open = "<!--";
         const endIdx = remaining.indexOf("-->");
-        tokens.push({ text: open, className: "wt-comment" });
-
         if (endIdx > -1) {
-          const body = remaining.slice(open.length, endIdx);
-          if (body) tokens.push({ text: body, className: "wt-comment" });
-          tokens.push({ text: "-->", className: "wt-comment" });
-          pos += endIdx + 3;
-          this.commentBuffer = "";
+          const commentText = remaining.slice(0, endIdx + 3);
+          tokens.push({ text: commentText, className: "wt-comment" });
+          pos += commentText.length;
         } else {
-          const afterOpen = remaining.slice(open.length);
-          if (afterOpen) tokens.push({ text: afterOpen, className: "wt-comment" });
+          tokens.push({ text: remaining, className: "wt-comment" });
           this.inMultilineComment = true;
           this.commentBuffer = remaining;
           return tokens;
         }
+        continue;
+      }
+
+      // Table delimiters in rows
+      if (
+        pos > 0 &&
+        inTableRow &&
+        this.templateDepth === 0 &&
+        (remaining.startsWith("|") || remaining.startsWith("!")) &&
+        remaining.slice(0, 3) !== "|-|"
+      ) {
+        flushBuffer();
+        const delimiter = remaining.startsWith("|") ? "|" : "!";
+        const className =
+          delimiter === "|" ? "wt-table-delimiter" : "wt-table-header";
+        tokens.push({ text: delimiter, className });
+        pos += 1;
         continue;
       }
 
