@@ -1,6 +1,6 @@
 /**
  * Default constants for wikitext highlighting.
- * 
+ *
  * Should make as much classes as possible so that users can config through CSS.
  */
 export const DEFAULT_URL_PROTOCOLS =
@@ -76,7 +76,7 @@ const generateSectionStyles = () => {
 
 const generateExtensionTagStyles = () => {
   return DEFAULT_CONTENT_PRESERVING_TAGS.map(
-    (tag) => `.wt-ext-${tag} { background-color: ${COLORS.lightGrayBg}; }`
+    (tag) => `.wt-ext-${tag} { background-color: ${COLORS.lightGrayBg}; }`,
   ).join("\n  ");
 };
 

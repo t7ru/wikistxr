@@ -1,7 +1,7 @@
 /**
  * Test page for the wikitext highlighter
  */
-import { WikitextHighlighter, WikitextEditor } from 'wikistxr';
+import { WikitextHighlighter, WikitextEditor } from "wikistxr";
 
 console.log("[Test Page] Initializing...");
 const styleElement = document.createElement("style");
@@ -199,16 +199,14 @@ Preformatted text
 <!-- HTML comment -->`,
 };
 
-let currentMode: 'editor' | 'highlighter' = 'editor';
+let currentMode: "editor" | "highlighter" = "editor";
 
 function highlightText() {
   const input = inputElement.value;
-  console.log("[Test Page] Highlighting text, length:", input.length);
+  const startTime = performance.now();
 
   try {
-    const startTime = performance.now();
-
-    if (currentMode === 'editor') {
+    if (currentMode === "editor") {
       editorHighlighter.update(input);
     } else {
       outputElement.innerHTML = staticHighlighter.highlight(input);
@@ -218,68 +216,117 @@ function highlightText() {
     const totalTime = (endTime - startTime) / 1000;
     const lines = input.split("\n").length;
     const chars = input.length;
-    const label = currentMode === 'editor' ? 'Editor' : 'Highlighter';
+    const label = currentMode === "editor" ? "Editor" : "Highlighter";
 
-    statsElement.textContent = `[${label}] ✓ Highlighted ${lines} lines, ${chars} characters in ${totalTime.toFixed(3)}s`;
-    console.log("[Test Page] Highlighting complete:", totalTime.toFixed(3) + "s");
+    statsElement.textContent = `[${label}] ✓ Highlighted ${lines} lines, ${chars} characters in ${totalTime.toFixed(
+      3,
+    )}s`;
+    console.log(
+      `[Test Page] [${label}] Highlighting complete in ${totalTime.toFixed(3)}s`,
+    );
   } catch (error) {
     console.error("[Test Page] Error:", error);
     const message = `Error: ${(error as Error).message}`;
     outputElement.innerHTML = `<span style="color: red;">${message}</span>`;
-    statsElement.textContent = `[${currentMode === 'editor' ? 'Editor' : 'Highlighter'}] ✗ ${message}`;
+    statsElement.textContent = `[${
+      currentMode === "editor" ? "Editor" : "Highlighter"
+    }] ✗ ${message}`;
   }
 }
 
-function setMode(mode: 'editor' | 'highlighter') {
+function setMode(mode: "editor" | "highlighter") {
   if (mode === currentMode) return;
   currentMode = mode;
 
-  if (mode === 'editor') {
-    outputElement.contentEditable = 'true';
+  const inputPanel = document.querySelector(
+    ".panel:first-child",
+  ) as HTMLElement;
+
+  if (mode === "editor") {
+    document.body.classList.add("editor-mode");
+    if (inputPanel) inputPanel.style.display = "none";
+
+    outputElement.contentEditable = "true";
     editorHighlighter.resetCache();
     editorHighlighter.attach(outputElement);
+    editorHighlighter.update(inputElement.value || samples.basic);
   } else {
-    outputElement.contentEditable = 'false';
-    editorHighlighter.resetCache();
-  }
+    document.body.classList.remove("editor-mode");
+    if (inputPanel) inputPanel.style.display = "block";
 
-  highlightText();
+    outputElement.contentEditable = "false";
+    editorHighlighter.resetCache();
+    highlightText();
+  }
 }
 
 if (inputElement && outputElement && statsElement && modeElement) {
-  inputElement.addEventListener("input", () => highlightText());
+  inputElement.addEventListener("input", () => {
+    highlightText();
+  });
+
   modeElement.addEventListener("change", () =>
-    setMode(modeElement.value === 'editor' ? 'editor' : 'highlighter')
+    setMode(modeElement.value === "editor" ? "editor" : "highlighter"),
   );
 
   document.getElementById("btn-basic")?.addEventListener("click", () => {
-    inputElement.value = samples.basic;
-    highlightText();
+    const text = samples.basic;
+    if (currentMode === "editor") {
+      editorHighlighter.update(text);
+    } else {
+      inputElement.value = text;
+      highlightText();
+    }
   });
 
   document.getElementById("btn-complex")?.addEventListener("click", () => {
-    inputElement.value = samples.complex;
-    highlightText();
+    const text = samples.complex;
+    if (currentMode === "editor") {
+      editorHighlighter.update(text);
+    } else {
+      inputElement.value = text;
+      highlightText();
+    }
   });
 
   document.getElementById("btn-links")?.addEventListener("click", () => {
-    inputElement.value = samples.links;
-    highlightText();
+    const text = samples.links;
+    if (currentMode === "editor") {
+      editorHighlighter.update(text);
+    } else {
+      inputElement.value = text;
+      highlightText();
+    }
   });
 
   document.getElementById("btn-templates")?.addEventListener("click", () => {
-    inputElement.value = samples.templates;
-    highlightText();
+    const text = samples.templates;
+    if (currentMode === "editor") {
+      editorHighlighter.update(text);
+    } else {
+      inputElement.value = text;
+      highlightText();
+    }
   });
 
   document.getElementById("btn-tables")?.addEventListener("click", () => {
-    inputElement.value = samples.tables;
-    highlightText();
+    const text = samples.tables;
+    if (currentMode === "editor") {
+      editorHighlighter.update(text);
+    } else {
+      inputElement.value = text;
+      highlightText();
+    }
   });
 
   document.getElementById("btn-tags")?.addEventListener("click", () => {
-    inputElement.value = samples.tags;
-    highlightText();
+    const text = samples.tags;
+    if (currentMode === "editor") {
+      editorHighlighter.update(text);
+    } else {
+      inputElement.value = text;
+      highlightText();
+    }
   });
 
   document.getElementById("btn-clear")?.addEventListener("click", () => {
@@ -288,8 +335,8 @@ if (inputElement && outputElement && statsElement && modeElement) {
   });
 
   inputElement.value = samples.basic;
-  modeElement.value = 'editor';
+  modeElement.value = "editor";
   editorHighlighter.attach(outputElement);
-  highlightText();
+  editorHighlighter.update(samples.basic);
   console.log("[Test Page] Ready");
 }

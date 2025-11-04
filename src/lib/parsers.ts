@@ -117,7 +117,7 @@ function parseInnerContent(content: string): string {
       break;
     } else if (nextSpecial > 0) {
       parts.push(
-        createSpan(content.slice(pos, pos + nextSpecial), "wt-template")
+        createSpan(content.slice(pos, pos + nextSpecial), "wt-template"),
       );
       pos += nextSpecial;
     } else {
@@ -150,7 +150,7 @@ export function parseTemplateParameter(text: string): string {
 
   if (pipeIdx > -1) {
     parts.push(
-      createSpan(inner.slice(0, pipeIdx), "wt-templateparameter-name")
+      createSpan(inner.slice(0, pipeIdx), "wt-templateparameter-name"),
     );
     parts.push(createSpan("|", "wt-templateparameter-delimiter"));
     parts.push(createSpan(inner.slice(pipeIdx + 1), "wt-templateparameter"));
@@ -241,7 +241,7 @@ export function parseExternalLink(text: string): string {
 export function parseTag(
   text: string,
   className: string | undefined,
-  extensionTags: string[]
+  extensionTags: string[],
 ): string {
   const tagMatch = text.match(/^<\/?([a-z][^\s>\/]*)/i);
   if (!tagMatch) return escapeHtml(text);

@@ -70,7 +70,7 @@ export function createSpan(text: string, className: string): string {
 export function findClosing(
   text: string,
   open: string,
-  close: string
+  close: string,
 ): ClosingResult | null {
   let depth = 0;
 

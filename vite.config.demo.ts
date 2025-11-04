@@ -1,17 +1,17 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { defineConfig } from "vite";
+import { resolve } from "path";
 
 export default defineConfig({
-  root: 'src/demo',
+  root: "src/demo",
   resolve: {
     alias: {
-      wikistxr: resolve(__dirname, 'dist/esm')
-    }
+      wikistxr: resolve(__dirname, "dist/esm"),
+    },
   },
   build: {
-    outDir: '../../dist/demo'
+    outDir: "../../dist/demo",
   },
   server: {
-    open: true
-  }
+    open: true,
+  },
 });

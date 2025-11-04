@@ -1,37 +1,37 @@
 /**
  * Core class for syntax highlighting Wikitext.
- * 
+ *
  * Tokenizes input text into structured tokens and renders them as HTML with CSS classes.
  * Supports customization via HighlightConfig for protocols, keywords, and tags.
  * Use WikitextHighlighter for full-pass highlighting or WikitextEditor for incremental updates.
- * 
+ *
  * @example
  * const highlighter = new WikitextHighlighter();
  * const html = highlighter.highlight(wikitextString);
  * container.innerHTML = html;
- * 
+ *
  * @example
  * const custom = new WikitextHighlighter({
  *   extensionTags: ['nowiki', 'ref', 'custom']
  * });
  */
-import type { HighlightToken, HighlightConfig } from './types';
+import type { HighlightToken, HighlightConfig } from "./types";
 import {
   DEFAULT_URL_PROTOCOLS,
   DEFAULT_REDIRECT_KEYWORDS,
   DEFAULT_EXTENSION_TAGS,
   DEFAULT_CONTENT_PRESERVING_TAGS,
-  DEFAULT_STYLES
-} from './constants';
-import { createSpan } from './utils';
-import { WikitextTokenizer } from './tokenizer';
+  DEFAULT_STYLES,
+} from "./constants";
+import { createSpan } from "./utils";
+import { WikitextTokenizer } from "./tokenizer";
 import {
   parseTemplate,
   parseTemplateParameter,
   parseLink,
   parseExternalLink,
-  parseTag
-} from './parsers';
+  parseTag,
+} from "./parsers";
 
 export class WikitextHighlighter {
   protected urlProtocols: RegExp;
@@ -46,18 +46,20 @@ export class WikitextHighlighter {
    */
   constructor(config: HighlightConfig = {}) {
     this.urlProtocols = config.urlProtocols || DEFAULT_URL_PROTOCOLS;
-    const redirectKeywords = config.redirectKeywords || DEFAULT_REDIRECT_KEYWORDS;
+    const redirectKeywords =
+      config.redirectKeywords || DEFAULT_REDIRECT_KEYWORDS;
     this.redirectRegex = new RegExp(
-      `^\\s*(?:#${redirectKeywords.join('|#')})(\\s*:)?\\s*(?=\\[\\[)`,
-      'i'
+      `^\\s*(?:#${redirectKeywords.join("|#")})(\\s*:)?\\s*(?=\\[\\[)`,
+      "i",
     );
     this.extensionTags = config.extensionTags || DEFAULT_EXTENSION_TAGS;
-    this.contentPreservingTags = config.contentPreservingTags || DEFAULT_CONTENT_PRESERVING_TAGS;
+    this.contentPreservingTags =
+      config.contentPreservingTags || DEFAULT_CONTENT_PRESERVING_TAGS;
     this.tokenizer = new WikitextTokenizer(
       this.urlProtocols,
       this.redirectRegex,
       this.extensionTags,
-      this.contentPreservingTags
+      this.contentPreservingTags,
     );
   }
 
@@ -67,10 +69,10 @@ export class WikitextHighlighter {
    * @returns HTML string with syntax highlighting classes
    */
   public highlight(text: string): string {
-    const lines = text.split('\n');
+    const lines = text.split("\n");
     const tokensPerLine = this.tokenizeLines(lines, true);
     const htmlLines = this.renderLines(tokensPerLine);
-    return htmlLines.join('\n');
+    return htmlLines.join("\n");
   }
 
   /**
@@ -79,7 +81,7 @@ export class WikitextHighlighter {
    * @returns Array of token arrays (one per line)
    */
   public tokenize(text: string): HighlightToken[][] {
-    return this.tokenizeLines(text.split('\n'), true);
+    return this.tokenizeLines(text.split("\n"), true);
   }
 
   /**
@@ -91,7 +93,7 @@ export class WikitextHighlighter {
    */
   protected tokenizeLines(
     lines: string[],
-    resetTokenizer = false
+    resetTokenizer = false,
   ): HighlightToken[][] {
     if (resetTokenizer) this.tokenizer.reset();
     const tokens: HighlightToken[][] = [];
@@ -108,8 +110,8 @@ export class WikitextHighlighter {
    * @protected
    */
   protected renderLines(tokensPerLine: HighlightToken[][]): string[] {
-    return tokensPerLine.map(lineTokens =>
-      lineTokens.map(token => this.renderToken(token)).join('')
+    return tokensPerLine.map((lineTokens) =>
+      lineTokens.map((token) => this.renderToken(token)).join(""),
     );
   }
 
@@ -123,12 +125,12 @@ export class WikitextHighlighter {
   protected renderToken(token: HighlightToken): string {
     const { text, className } = token;
 
-    if (className === 'wt-template-full') return parseTemplate(text);
-    if (className === 'wt-template-var') return parseTemplateParameter(text);
-    if (className === 'wt-link-full') return parseLink(text);
-    if (className === 'wt-extlink-full') return parseExternalLink(text);
+    if (className === "wt-template-full") return parseTemplate(text);
+    if (className === "wt-template-var") return parseTemplateParameter(text);
+    if (className === "wt-link-full") return parseLink(text);
+    if (className === "wt-extlink-full") return parseExternalLink(text);
 
-    if (className?.startsWith('wt-ext-') || text.startsWith('<')) {
+    if (className?.startsWith("wt-ext-") || text.startsWith("<")) {
       return parseTag(text, className, this.extensionTags);
     }
 
@@ -148,7 +150,7 @@ export class WikitextHighlighter {
   }
 }
 
-export type { HighlightToken, HighlightConfig } from './types';
+export type { HighlightToken, HighlightConfig } from "./types";
 
 /**
  * Escape HTML special characters to prevent injection.
@@ -158,9 +160,9 @@ export type { HighlightToken, HighlightConfig } from './types';
  */
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#x27;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
 }
