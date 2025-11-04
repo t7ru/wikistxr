@@ -176,8 +176,8 @@ https://example.com`,
   templates: `{{Template}}
 {{Template|param1|param2}}
 {{Template|name=value|name2=value2}}
-{{{Variable}}}
-{{{Variable|default value}}}`,
+{{{Parameter}}}
+{{{Parameter|default value}}}`,
 
   tables: `{| class="wikitable"
 ! Header 1 !! Header 2 !! Header 3
@@ -206,31 +206,26 @@ function highlightText() {
   const startTime = performance.now();
 
   try {
-    if (currentMode === "editor") {
-      editorHighlighter.update(input);
-    } else {
+    if (currentMode === "highlighter") {
       outputElement.innerHTML = staticHighlighter.highlight(input);
+      const endTime = performance.now();
+      const totalTime = (endTime - startTime) / 1000;
+      const lines = input.split("\n").length;
+      const chars = input.length;
+      statsElement.textContent = `✓ Highlighted ${lines} lines, ${chars} characters in ${totalTime.toFixed(
+        3,
+      )}s`;
+      console.log(
+        `[Test Page] [Highlighter] Highlighting complete in ${totalTime.toFixed(3)}s`,
+      );
     }
-
-    const endTime = performance.now();
-    const totalTime = (endTime - startTime) / 1000;
-    const lines = input.split("\n").length;
-    const chars = input.length;
-    const label = currentMode === "editor" ? "Editor" : "Highlighter";
-
-    statsElement.textContent = `[${label}] ✓ Highlighted ${lines} lines, ${chars} characters in ${totalTime.toFixed(
-      3,
-    )}s`;
-    console.log(
-      `[Test Page] [${label}] Highlighting complete in ${totalTime.toFixed(3)}s`,
-    );
   } catch (error) {
     console.error("[Test Page] Error:", error);
     const message = `Error: ${(error as Error).message}`;
     outputElement.innerHTML = `<span style="color: red;">${message}</span>`;
-    statsElement.textContent = `[${
-      currentMode === "editor" ? "Editor" : "Highlighter"
-    }] ✗ ${message}`;
+    if (currentMode === "highlighter") {
+      statsElement.textContent = `[Highlighter] ✗ ${message}`;
+    }
   }
 }
 
@@ -245,6 +240,7 @@ function setMode(mode: "editor" | "highlighter") {
   if (mode === "editor") {
     document.body.classList.add("editor-mode");
     if (inputPanel) inputPanel.style.display = "none";
+    statsElement.innerHTML = '✗ <strong>Editor mode is experimental.</strong> Use "Highlighter" mode for stable and reliable production use cases.';
 
     outputElement.contentEditable = "true";
     editorHighlighter.resetCache();
@@ -330,13 +326,16 @@ if (inputElement && outputElement && statsElement && modeElement) {
   });
 
   document.getElementById("btn-clear")?.addEventListener("click", () => {
-    inputElement.value = "";
-    highlightText();
+    if (currentMode === "editor") {
+      editorHighlighter.update("");
+    } else {
+      inputElement.value = "";
+      highlightText();
+    }
   });
 
   inputElement.value = samples.basic;
-  modeElement.value = "editor";
-  editorHighlighter.attach(outputElement);
-  editorHighlighter.update(samples.basic);
+  modeElement.value = "highlighter";
+  setMode("highlighter");
   console.log("[Test Page] Ready");
 }

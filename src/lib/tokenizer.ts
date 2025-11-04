@@ -84,13 +84,16 @@ export class WikitextTokenizer {
     if (this.inMultilineComment) {
       const commentEnd = line.indexOf("-->");
       if (commentEnd > -1) {
-        this.commentBuffer += line.slice(0, commentEnd + 3);
-        tokens.push({ text: this.commentBuffer, className: "wt-comment" });
+        const beforeClose = line.slice(0, commentEnd);
+        if (beforeClose) {
+          tokens.push({ text: beforeClose, className: "wt-comment" });
+        }
+        tokens.push({ text: "-->", className: "wt-comment" });
         this.inMultilineComment = false;
         this.commentBuffer = "";
         pos = commentEnd + 3;
       } else {
-        this.commentBuffer += line + "\n";
+        this.commentBuffer += (this.commentBuffer ? "\n" : "") + line;
         tokens.push({ text: line, className: "wt-comment" });
         return tokens;
       }
@@ -214,7 +217,30 @@ export class WikitextTokenizer {
     while (pos < line.length) {
       const remaining = line.slice(pos);
 
-      // Template parameters/variables {{{...}}}
+      // HTML comments
+      if (remaining.startsWith("<!--")) {
+        flushBuffer();
+        const open = "<!--";
+        const endIdx = remaining.indexOf("-->");
+        tokens.push({ text: open, className: "wt-comment" });
+
+        if (endIdx > -1) {
+          const body = remaining.slice(open.length, endIdx);
+          if (body) tokens.push({ text: body, className: "wt-comment" });
+          tokens.push({ text: "-->", className: "wt-comment" });
+          pos += endIdx + 3;
+          this.commentBuffer = "";
+        } else {
+          const afterOpen = remaining.slice(open.length);
+          if (afterOpen) tokens.push({ text: afterOpen, className: "wt-comment" });
+          this.inMultilineComment = true;
+          this.commentBuffer = remaining;
+          return tokens;
+        }
+        continue;
+      }
+
+      // Template parameters {{{...}}}
       if (remaining.startsWith("{{{")) {
         flushBuffer();
         let varPos = 0;
@@ -547,17 +573,6 @@ export class WikitextTokenizer {
    * @private
    */
   private parseToken(remaining: string): HighlightToken | null {
-    // html comments
-    const commentMatch = remaining.match(/^<!--([\s\S]*?)-->/);
-    if (commentMatch) {
-      return { text: commentMatch[0], className: "wt-comment" };
-    }
-    if (remaining.startsWith("<!--")) {
-      this.inMultilineComment = true;
-      this.commentBuffer = remaining + "\n";
-      return { text: remaining, className: "wt-comment" };
-    }
-
     // content preserving tags like extensions
     if (remaining.startsWith("<")) {
       const tagMatch = remaining.match(/^<\/?([a-z][^\s>\/]*)/i);

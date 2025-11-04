@@ -2,7 +2,7 @@
  * Parsers for wikitext syntax elements.
  *
  * Each function takes raw wikitext text and returns HTML with syntax highlighting classes.
- * Handles templates, template variables, links, external links, and extension tags.
+ * Handles templates, template parameters, links, external links, and extension tags.
  * Supports nested structures (e.g., templates within templates, links within templates).
  */
 import { escapeHtml, createSpan } from "./utils";

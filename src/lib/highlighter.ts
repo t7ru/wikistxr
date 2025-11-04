@@ -130,6 +130,10 @@ export class WikitextHighlighter {
     if (className === "wt-link-full") return parseLink(text);
     if (className === "wt-extlink-full") return parseExternalLink(text);
 
+    if (className === "wt-comment") {
+      return createSpan(text, className);
+    }
+
     if (className?.startsWith("wt-ext-") || text.startsWith("<")) {
       return parseTag(text, className, this.extensionTags);
     }
