@@ -1,5 +1,5 @@
 /**
- * Main entry point
+ * Main entry point.
  */
 export { WikitextHighlighter } from "./highlighter";
 export { WikitextEditor } from "./editor";

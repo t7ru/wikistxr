@@ -1,8 +1,14 @@
 /**
  * Optimized WikitextTokenizer for parsing wikitext into tokens.
+ * 
  * Batches consecutive plain/template text into single tokens for efficiency.
  * Maintains multi-line state for comments, extension tags, and templates.
  * Supports incremental highlighting via getState/setState.
+ * 
+ * @example
+ * const tokenizer = new WikitextTokenizer(urlProtocols, redirectRegex, extensionTags, contentPreservingTags);
+ * const tokens = tokenizer.tokenizeLine("'''Bold''' text");
+ * // Returns: [{ text: "'''Bold'''", className: "wt-strong" }, { text: " text", className: "" }]
  */
 import type { HighlightToken, TokenizerState } from './types';
 import { findClosing } from './utils';
@@ -11,12 +17,31 @@ export class WikitextTokenizer {
   private commentBuffer = '';
   private inExtensionTag: string | null = null;
   private templateDepth = 0;
+
+  /**
+   * Create a new WikitextTokenizer.
+   * @param urlProtocols - RegExp for recognized URL protocols
+   * @param redirectRegex - RegExp for redirect syntax detection
+   * @param extensionTags - List of recognized extension tags (e.g., nowiki, ref)
+   * @param contentPreservingTags - List of tags that preserve inner content as-is
+   */
   constructor(
     private urlProtocols: RegExp,
     private redirectRegex: RegExp,
     private extensionTags: string[],
     private contentPreservingTags: string[]
   ) {}
+
+  /**
+   * Tokenize a single line of wikitext.
+   * 
+   * Handles continuation of multi-line comments and extension tags.
+   * Recognizes headers, lists, tables, templates, links, and other wikitext syntax.
+   * 
+   * @param line - The wikitext line to tokenize
+   * @param isFirstLine - Whether this is the first line (enables redirect detection)
+   * @returns Array of HighlightToken objects
+   */
   public tokenizeLine(line: string, isFirstLine: boolean): HighlightToken[] {
     let pos = 0;
     const tokens: HighlightToken[] = [];
@@ -207,11 +232,11 @@ export class WikitextTokenizer {
           tokens.push({ text: fullText, className: 'wt-template-var' });
         } else {
           // partials push separate tokens
-          tokens.push({ text: open, className: 'wt-templatevariable-bracket' });
-          if (name) tokens.push({ text: name, className: 'wt-templatevariable-name' });
+          tokens.push({ text: open, className: 'wt-templateparameter-bracket' });
+          if (name) tokens.push({ text: name, className: 'wt-templateparameter-name' });
           for (let p = 0; p < params.length; p++) {
-            tokens.push({ text: '|', className: 'wt-templatevariable-delimiter' });
-            if (params[p]) tokens.push({ text: params[p], className: 'wt-templatevariable' });
+            tokens.push({ text: '|', className: 'wt-templateparameter-delimiter' });
+            if (params[p]) tokens.push({ text: params[p], className: 'wt-templateparameter' });
           }
         }
         pos += fullLength;
@@ -265,11 +290,11 @@ export class WikitextTokenizer {
           if (isComplete) {
             tokens.push({ text: remaining.slice(0, fullLength), className: 'wt-template-var' });
           } else {
-            tokens.push({ text: open, className: 'wt-templatevariable-bracket' });
-            if (name) tokens.push({ text: name, className: 'wt-templatevariable-name' });
+            tokens.push({ text: open, className: 'wt-templateparameter-bracket' });
+            if (name) tokens.push({ text: name, className: 'wt-templateparameter-name' });
             for (let p = 0; p < params.length; p++) {
-              tokens.push({ text: '|', className: 'wt-templatevariable-delimiter' });
-              if (params[p]) tokens.push({ text: params[p], className: 'wt-templatevariable' });
+              tokens.push({ text: '|', className: 'wt-templateparameter-delimiter' });
+              if (params[p]) tokens.push({ text: params[p], className: 'wt-templateparameter' });
             }
           }
           pos += fullLength;
@@ -415,6 +440,16 @@ export class WikitextTokenizer {
     flushBuffer();
     return tokens;
   }
+  /**
+   * Parse a single token from remaining wikitext.
+   * 
+   * Attempts to match comments, tags, links, bold/italic, entities, and magic words.
+   * Returns null if no pattern matches (plain text).
+   * 
+   * @param remaining - The remaining wikitext to parse
+   * @returns HighlightToken if a pattern matches, null otherwise
+   * @private
+   */
   private parseToken(remaining: string): HighlightToken | null {
   // html comments
   const commentMatch = remaining.match(/^<!--([\s\S]*?)-->/);
@@ -533,6 +568,11 @@ export class WikitextTokenizer {
   }
   return null;
 }
+  /**
+   * Reset all tokenizer state to initial values.
+   * 
+   * Call before tokenizing a new document to clear multiline context.
+   */
   public reset() {
     this.inMultilineComment = false;
     this.commentBuffer = '';
@@ -541,6 +581,11 @@ export class WikitextTokenizer {
   }
   /**
    * Get current tokenizer state for incremental highlighting.
+   * 
+   * Captures multiline comment buffer, active extension tag, and template depth.
+   * Use with setState() to resume tokenization with preserved context.
+   * 
+   * @returns Current TokenizerState
    */
   public getState(): TokenizerState {
     return {
@@ -552,6 +597,11 @@ export class WikitextTokenizer {
   }
   /**
    * Set tokenizer state for incremental highlighting.
+   * 
+   * Restores multiline context from a previously captured state.
+   * Use with getState() to resume tokenization at a specific point.
+   * 
+   * @param state - The TokenizerState to restore
    */
   public setState(state: TokenizerState): void {
     this.inMultilineComment = state.inMultilineComment;

@@ -1,6 +1,6 @@
 /**
- * Type definitions and whatnot
- * Defines interfaces used across the library
+ * Type definitions and whatnot.
+ * Defines interfaces used across the library.
  */
 export interface HighlightToken {
   text: string;

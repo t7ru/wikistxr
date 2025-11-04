@@ -1,14 +1,22 @@
 /**
- * Utility functions for wikitext highlighting.
- * - HTML escaping
- * - Safe span creation
- * - Delimiter matching with nesting (e.g. [[ [[ ]] ]])
+ * Utility functions for WikitextHighlighter.
+ * Includes HTML escaping, span creation, and bracket matching for parsing wikitext syntax.
  */
 
 import type { ClosingResult } from "./types";
 
 /**
- * Escape HTML special characters so user text can't break your output.
+ * Escape HTML special characters to prevent injection.
+ *
+ * Converts &, <, >, ", and ' to their HTML entity equivalents.
+ * Use before inserting user text into HTML to prevent XSS vulnerabilities.
+ * Some people are too clever for their own good.
+ *
+ * @param text - The text to escape
+ * @returns Escaped HTML text
+ * @example
+ * escapeHtml("<script>alert('xss')</script>")
+ * // Returns: "&lt;script&gt;alert(&#x27;xss&#x27;)&lt;/script&gt;"
  */
 export function escapeHtml(text: string): string {
   return text
@@ -20,8 +28,21 @@ export function escapeHtml(text: string): string {
 }
 
 /**
- * Wrap text in <span class="..."> safely.
- * If className is empty, just return escaped text.
+ * Wrap text in a styled span element.
+ *
+ * Creates an HTML span with the given class name. If className is empty,
+ * returns escaped text without span wrapping for efficiency.
+ *
+ * @param text - The text content
+ * @param className - CSS class name(s), or empty string for no wrapping
+ * @returns HTML span element or escaped text
+ * @example
+ * createSpan("bold", "wt-strong")
+ * // Returns: "<span class="wt-strong">bold</span>"
+ *
+ * @example
+ * createSpan("plain", "")
+ * // Returns: "plain"
  */
 export function createSpan(text: string, className: string): string {
   const escaped = escapeHtml(text);
@@ -29,11 +50,22 @@ export function createSpan(text: string, className: string): string {
 }
 
 /**
- * Find the first complete balanced pair of `open`…`close`, handling nesting
- * Returns { content, end } where:
- *    content = substring from 0 up to and including the matching close
- *    end = index right after that closing token
- * Returns null if never balanced
+ * Find the first complete balanced pair of opening and closing delimiters.
+ *
+ * Handles nested delimiters (e.g., [[ [[ ]] ]]) by tracking depth.
+ * Useful for matching wikitext brackets like [[...]], {{...}}, etc.
+ *
+ * @param text - The text to search
+ * @param open - Opening delimiter (e.g., "[[")
+ * @param close - Closing delimiter (e.g., "]]")
+ * @returns Object with content (substring including delimiters) and end position, or null if unbalanced
+ * @example
+ * findClosing("[[link|text]] after", "[[", "]]")
+ * // Returns: { content: "[[link|text]]", end: 14 }
+ *
+ * @example
+ * findClosing("[[unclosed", "[[", "]]")
+ * // Returns: null
  */
 export function findClosing(
   text: string,
@@ -43,14 +75,12 @@ export function findClosing(
   let depth = 0;
 
   for (let i = 0; i < text.length; i++) {
-    // match opener
     if (text.slice(i, i + open.length) === open) {
       depth++;
       i += open.length - 1;
       continue;
     }
 
-    // match closer
     if (text.slice(i, i + close.length) === close) {
       depth--;
       if (depth === 0) {

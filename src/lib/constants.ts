@@ -1,7 +1,7 @@
 /**
- * Default constants for wikitext highlighting
+ * Default constants for wikitext highlighting.
  * 
- * Should make as much classes as possible so that users can config through CSS
+ * Should make as much classes as possible so that users can config through CSS.
  */
 export const DEFAULT_URL_PROTOCOLS =
   /^(?:ftp|ftps|git|gopher|http|https|irc|ircs|mms|nntp|redis|sftp|ssh|svn|telnet|worldwind)(?=[^\s\u00a0{[\]<>~).,'])/i;
@@ -112,7 +112,7 @@ export const DEFAULT_STYLES = `
   .wt-template-bracket { font-weight: bold; }
   .wt-template-argument-name { color: ${COLORS.darkBrown}; }
 
-  /* Template variables */
+  /* Template parameters */
   .wt-templatevariable,
   .wt-templatevariable-bracket,
   .wt-templatevariable-name,

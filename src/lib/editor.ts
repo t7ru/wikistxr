@@ -1,11 +1,14 @@
 /**
- * Incremental wikitext editor helper
- *
- * Extends WikitextHighlighter to provide live, line-based incremental
- * highlighting for editable wikitext. Caches tokens and parser states to
- * retokenize only changed lines, maintaining multiline context across edits
+ * Incremental wikitext editor helper.
  * 
- * Supports DOM updates via attach() and update()
+ * Extends WikitextHighlighter to provide live, line-based incremental highlighting
+ * for editable wikitext. Caches tokens and parser states to retokenize only changed
+ * lines while maintaining multiline context (comments, tags, templates) across edits.
+ * 
+ * @example
+ * const editor = new WikitextEditor();
+ * editor.attach(editableDiv);
+ * editableDiv.addEventListener('input', (e) => editor.update(e.currentTarget.textContent));
  */
 import type { HighlightToken, HighlightConfig, TokenizerState } from "./types";
 import { WikitextHighlighter } from "./highlighter";
@@ -31,6 +34,9 @@ export class WikitextEditor extends WikitextHighlighter {
     this.resetCache();
   }
 
+  /**
+   * Reset all caches and tokenizer state.
+   */
   public resetCache(): void {
     this.tokenizer.reset();
     this.lastLines = [];
@@ -45,6 +51,10 @@ export class WikitextEditor extends WikitextHighlighter {
     ];
   }
 
+  /**
+   * Attach editor to a DOM element. Makes it contentEditable and clears existing content.
+   * @param container - The HTML element to attach to
+   */
   public attach(container: HTMLElement): void {
     this.container = container;
     this.container.contentEditable = "true";
@@ -52,6 +62,11 @@ export class WikitextEditor extends WikitextHighlighter {
     this.lineElements = [];
   }
 
+  /**
+   * Update editor with new wikitext. Retokenizes changed lines and patches DOM.
+   * @param text - The wikitext content to render
+   * @throws Error if attach() was not called first
+   */
   public update(text: string): void {
     if (!this.container) throw new Error("Call attach() first");
 
@@ -76,17 +91,35 @@ export class WikitextEditor extends WikitextHighlighter {
     }
   }
 
+  /**
+   * Highlight wikitext without DOM attachment. Returns HTML string.
+   * @param text - The wikitext content to highlight
+   * @returns HTML string with syntax highlighting
+   */
   public override highlight(text: string): string {
     const lines = text.split("\n");
     const htmlLines = this.computeLines(lines);
     return htmlLines.join("\n");
   }
 
+  /**
+   * Tokenize wikitext into structured tokens. Updates cache.
+   * @param text - The wikitext content to tokenize
+   * @returns Array of token arrays (one per line)
+   */
   public override tokenize(text: string): HighlightToken[][] {
     this.computeLines(text.split("\n"));
     return this.cachedTokens;
   }
 
+  /**
+   * Compute line tokens with incremental retokenization.
+   * Finds the first changed line, retokenizes from there, and stops early if
+   * the tokenizer state converges with the cached state.
+   * @param lines - Array of wikitext lines
+   * @returns Array of HTML strings (one per line)
+   * @private
+   */
   private computeLines(lines: string[]): string[] {
     const initialState: TokenizerState = {
       inMultilineComment: false,
