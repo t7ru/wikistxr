@@ -113,11 +113,11 @@ export const DEFAULT_STYLES = `
   .wt-template-argument-name { color: ${COLORS.darkBrown}; }
 
   /* Template parameters */
-  .wt-templatevariable,
-  .wt-templatevariable-bracket,
-  .wt-templatevariable-name,
-  .wt-templatevariable-delimiter { color: ${COLORS.purple}; }
-  .wt-templatevariable-bracket { font-weight: bold; }
+  .wt-templateparameter,
+  .wt-templateparameter-bracket,
+  .wt-templateparameter-name,
+  .wt-templateparameter-delimiter { color: ${COLORS.purple}; }
+  .wt-templateparameter-bracket { font-weight: bold; }
 
   /* Tags */
   .wt-exttag { color: ${COLORS.purple}; }

@@ -27,7 +27,7 @@ import { createSpan } from './utils';
 import { WikitextTokenizer } from './tokenizer';
 import {
   parseTemplate,
-  parseTemplateVariable,
+  parseTemplateParameter,
   parseLink,
   parseExternalLink,
   parseTag
@@ -124,7 +124,7 @@ export class WikitextHighlighter {
     const { text, className } = token;
 
     if (className === 'wt-template-full') return parseTemplate(text);
-    if (className === 'wt-template-var') return parseTemplateVariable(text);
+    if (className === 'wt-template-var') return parseTemplateParameter(text);
     if (className === 'wt-link-full') return parseLink(text);
     if (className === 'wt-extlink-full') return parseExternalLink(text);
 

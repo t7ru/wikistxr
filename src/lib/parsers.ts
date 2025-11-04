@@ -138,10 +138,10 @@ function parseInnerContent(content: string): string {
  * @param text - Parameter text including brackets, e.g., "{{{parameter|default}}}"
  * @returns HTML string with template parameter classes
  * @example
- * parseTemplateVariable("{{{author|Unknown}}}")
+ * parseTemplateParameter("{{{author|Unknown}}}")
  * // Returns: <span class="wt-templateparameter-bracket">{{{</span>...
  */
-export function parseTemplateVariable(text: string): string {
+export function parseTemplateParameter(text: string): string {
   const parts: string[] = [];
   parts.push(createSpan("{{{", "wt-templateparameter-bracket"));
 
