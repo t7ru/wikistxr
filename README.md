@@ -19,6 +19,12 @@ A lightweight and fast library for **Wiki**text that has a **s**yn**t**a**x** hi
 npm install wikistxr
 ```
 
+or
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/wikistxr@latest/dist/wikistxr.min.js"></script>
+```
+
 ## Two Modes
 
 ### WikitextHighlighter

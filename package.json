@@ -1,6 +1,6 @@
 {
   "name": "wikistxr",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Lightweight wikitext library for syntax highlighting and editing.",
   "type": "module",
   "main": "./dist/cjs/index.js",
@@ -9,7 +9,8 @@
   "files": [
     "dist/cjs",
     "dist/esm",
-    "dist/index.d.ts"
+    "dist/index.d.ts",
+    "dist/wikistxr.min.js"
   ],
   "exports": {
     ".": {
@@ -20,7 +21,7 @@
   },
   "scripts": {
     "dev": "vite --config vite.config.demo.ts",
-    "build": "tsc --project tsconfig.json && vite build",
+    "build": "vite build --config vite.config.ts && vite build --config vite.config.iife.ts && tsc --project tsconfig.json",
     "build:demo": "vite build --config vite.config.demo.ts",
     "preview": "vite preview --config vite.config.demo.ts",
     "format": "prettier . --write"
@@ -42,5 +43,6 @@
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.12"
-  }
+  },
+  "homepage": "https://wikistxr.t7ru.link"
 }
