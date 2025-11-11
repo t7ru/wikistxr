@@ -29,8 +29,26 @@ describe("WikitextTokenizer", () => {
 
   it("recognizes external links according to the protocol whitelist", () => {
     const tokenizer = createTokenizer();
-    const tokens = tokenizer.tokenizeLine("[https://example.org Example]", false);
+    const tokens = tokenizer.tokenizeLine("[https://tds.wiki Example]", false);
 
-    expect(tokens).toEqual([{ text: "[https://example.org Example]", className: "wt-extlink-full" }]);
+    expect(tokens).toEqual([{ text: "[https://tds.wiki Example]", className: "wt-extlink-full" }]);
+  });
+
+  it("respects custom protocols for bracketed external links", () => {
+    const extendedProtocols = new RegExp(
+      DEFAULT_URL_PROTOCOLS.source.replace("^(?:", "^(?:mailto|"),
+      DEFAULT_URL_PROTOCOLS.flags,
+    );
+    const tokenizer = new WikitextTokenizer(
+      extendedProtocols,
+      /^$/,
+      DEFAULT_EXTENSION_TAGS,
+      DEFAULT_CONTENT_PRESERVING_TAGS,
+    );
+    const tokens = tokenizer.tokenizeLine("[mailto:toru@tds.wiki Label]", false);
+
+    expect(tokens).toEqual([
+      { text: "[mailto:toru@tds.wiki Label]", className: "wt-extlink-full" },
+    ]);
   });
 });
