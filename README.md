@@ -22,7 +22,7 @@ npm install wikistxr
 or
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/wikistxr@latest/dist/wikistxr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wikistxr@latest/dist/index.min.js"></script>
 ```
 
 ## Two Modes
