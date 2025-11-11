@@ -169,9 +169,9 @@ Once a renowned doctor, '''Patient Zero''' dedicated his life to healing others.
   links: `[[Internal Link]]
 [[Article|Display Text]]
 [[File:Example.png|thumb|Caption]]
-[https://example.com External Link]
-[https://example.com Example Site]
-https://example.com`,
+[https://tds-editor.com External Link]
+[https://tds.wiki Example Site]
+https://alterego.wiki`,
 
   templates: `{{Template}}
 {{Template|param1|param2}}
