@@ -497,8 +497,8 @@ export class WikitextTokenizer {
         continue;
       }
 
-      // External links [http...]
-      if (remaining.match(/^\[https?:\/\//i)) {
+      // treats complete bracketed links as a single token
+      if (remaining.startsWith("[") && this.matchesUrlProtocol(remaining.slice(1))) {
         flushBuffer();
         let linkPos = 0;
         const open = "[";
@@ -638,8 +638,8 @@ export class WikitextTokenizer {
       }
     }
 
-    // external links [http...]
-    if (remaining.match(/^\[https?:\/\//i)) {
+    // external links [protocol://...]
+    if (remaining.startsWith("[") && this.matchesUrlProtocol(remaining.slice(1))) {
       const closeIdx = remaining.indexOf("]");
       if (closeIdx > -1) {
         const linkText = remaining.slice(0, closeIdx + 1);
@@ -648,7 +648,7 @@ export class WikitextTokenizer {
     }
 
     // bare urls
-    if (!this.inExtensionTag && this.urlProtocols.test(remaining)) {
+    if (!this.inExtensionTag && this.matchesUrlProtocol(remaining)) {
       const match = remaining.match(/^[^\s\u00a0{[\]<>~]+/);
       if (match) {
         let url = match[0];
@@ -758,5 +758,10 @@ export class WikitextTokenizer {
     this.commentBuffer = state.commentBuffer;
     this.inExtensionTag = state.inExtensionTag;
     this.templateDepth = state.templateDepth;
+  }
+
+  private matchesUrlProtocol(text: string): boolean {
+    this.urlProtocols.lastIndex = 0;
+    return this.urlProtocols.test(text);
   }
 }

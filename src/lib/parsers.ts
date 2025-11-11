@@ -255,23 +255,31 @@ export function parseTag(
   const tagClass = `wt-exttag ${baseClass}`;
 
   if (className?.endsWith("-full")) {
-    const openTag = `<${tagName}>`;
-    const closeTag = `</${tagName}>`;
-    const openIdx = text.indexOf(openTag);
-    const closeIdx = text.indexOf(closeTag, openIdx + openTag.length);
+    const normalized = text.toLowerCase();
+    const openIdx = normalized.indexOf(`<${tagName}`);
+    if (openIdx > -1) {
+      const openEnd = text.indexOf(">", openIdx);
+      if (openEnd > -1) {
+        const closeIdx = normalized.indexOf(`</${tagName}`, openEnd);
+        if (closeIdx > -1) {
+          const closeEnd = text.indexOf(">", closeIdx);
+          if (closeEnd > -1) {
+            const before = text.slice(0, openIdx);
+            const openTagText = text.slice(openIdx, openEnd + 1);
+            const content = text.slice(openEnd + 1, closeIdx);
+            const closeTagText = text.slice(closeIdx, closeEnd + 1);
+            const after = text.slice(closeEnd + 1);
 
-    if (openIdx > -1 && closeIdx > -1) {
-      const before = text.slice(0, openIdx);
-      const content = text.slice(openIdx + openTag.length, closeIdx);
-      const after = text.slice(closeIdx + closeTag.length);
-
-      return (
-        createSpan(before, baseClass) +
-        createSpan(openTag, tagClass) +
-        createSpan(content, baseClass) +
-        createSpan(closeTag, tagClass) +
-        createSpan(after, baseClass)
-      );
+            return (
+              createSpan(before, baseClass) +
+              createSpan(openTagText, tagClass) +
+              createSpan(content, baseClass) +
+              createSpan(closeTagText, tagClass) +
+              createSpan(after, baseClass)
+            );
+          }
+        }
+      }
     }
   }
 
