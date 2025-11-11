@@ -215,7 +215,7 @@ export function parseExternalLink(text: string): string {
   if (spaceIdx > -1) {
     parts.push(createSpan(inner.slice(0, spaceIdx), "wt-extlink"));
     parts.push(" ");
-    parts.push(createSpan(inner.slice(spaceIdx + 1), "wt-extlink-text"));
+    parts.push(createSpan(inner.slice(spaceIdx + 1), ""));
   } else {
     parts.push(createSpan(inner, "wt-extlink"));
   }

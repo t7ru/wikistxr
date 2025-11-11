@@ -486,7 +486,7 @@ export class WikitextTokenizer {
           tokens.push({ text: fullText, className: "wt-link-full" });
         } else {
           tokens.push({ text: open, className: "wt-link-bracket" });
-          if (page) tokens.push({ text: page, className: "wt-link-page" });
+          if (page) tokens.push({ text: page, className: "wt-link-pagename" });
           for (let p = 0; p < params.length; p++) {
             tokens.push({ text: "|", className: "wt-link-pipe" });
             if (params[p])

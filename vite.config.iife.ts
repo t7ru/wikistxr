@@ -7,7 +7,7 @@ export default defineConfig({
       entry: resolve(__dirname, "src/lib/index.ts"),
       name: "Wikistxr",
       formats: ["iife"],
-      fileName: () => "wikistxr.min.js",
+      fileName: () => "index.min.js",
     },
     emptyOutDir: false,
     minify: "esbuild",

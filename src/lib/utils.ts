@@ -28,6 +28,19 @@ export function escapeHtml(text: string): string {
 }
 
 /**
+ * Escape a string for safe use inside RegExp constructors.
+ *
+ * Replaces regex metacharacters with escaped versions so user provided keywords
+ * can be interpolated into dynamic regular expressions safely.
+ *
+ * @param value - Raw string to escape
+ * @returns Escaped string suitable for new RegExp()
+ */
+export function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
  * Wrap text in a styled span element.
  *
  * Creates an HTML span with the given class name. If className is empty,

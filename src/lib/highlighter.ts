@@ -23,7 +23,7 @@ import {
   DEFAULT_CONTENT_PRESERVING_TAGS,
   DEFAULT_STYLES,
 } from "./constants";
-import { createSpan } from "./utils";
+import { createSpan, escapeHtml, escapeRegExp } from "./utils";
 import { WikitextTokenizer } from "./tokenizer";
 import {
   parseTemplate,
@@ -48,8 +48,9 @@ export class WikitextHighlighter {
     this.urlProtocols = config.urlProtocols || DEFAULT_URL_PROTOCOLS;
     const redirectKeywords =
       config.redirectKeywords || DEFAULT_REDIRECT_KEYWORDS;
+    const escapedRedirectKeywords = redirectKeywords.map(escapeRegExp);
     this.redirectRegex = new RegExp(
-      `^\\s*(?:#${redirectKeywords.join("|#")})(\\s*:)?\\s*(?=\\[\\[)`,
+      `^\\s*(?:#${escapedRedirectKeywords.join("|#")})(\\s*:)?\\s*(?=\\[\\[)`,
       "i",
     );
     this.extensionTags = config.extensionTags || DEFAULT_EXTENSION_TAGS;
@@ -155,18 +156,3 @@ export class WikitextHighlighter {
 }
 
 export type { HighlightToken, HighlightConfig } from "./types";
-
-/**
- * Escape HTML special characters to prevent injection.
- * @param text - The text to escape
- * @returns Escaped HTML text
- * @private
- */
-function escapeHtml(text: string): string {
-  return text
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
-}
