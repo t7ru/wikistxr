@@ -1,6 +1,6 @@
 {
   "name": "wikistxr",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Lightweight wikitext library for syntax highlighting and editing.",
   "jsdelivr": "dist/index.min.js",
   "type": "module",

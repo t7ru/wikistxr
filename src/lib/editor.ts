@@ -624,7 +624,21 @@ export class WikitextEditor extends WikitextHighlighter {
       return this.renderLines(this.cachedTokens);
     }
 
-    const startState = start > 0 ? this.cachedStates[start] : initialState;
+    const startState =
+      (start > 0 ? this.cachedStates[start] : initialState) ?? initialState;
+
+    if (!this.cachedStates[start] && start > 0) {
+      this.debugEmit({
+        type: "warn",
+        message: "cachedStates[start] was undefined; reset to initialState",
+        data: {
+          start,
+          cachedStatesLength: this.cachedStates.length,
+          linesLength: lines.length,
+          lastLinesLength: this.lastLines.length,
+        },
+      });
+    }
 
     this.tokenizer.setState(startState);
     const newTokens: HighlightToken[][] = this.cachedTokens.slice(0, start);
@@ -647,7 +661,7 @@ export class WikitextEditor extends WikitextHighlighter {
 
       if (lineSameAsCached) {
         const oldAfter = this.cachedStates[i + 1];
-        if (statesEqual(after, oldAfter)) {
+        if (oldAfter && statesEqual(after, oldAfter)) {
           newTokens.push(...this.cachedTokens.slice(i + 1));
           newStates.push(...this.cachedStates.slice(i + 2));
           converged = true;
