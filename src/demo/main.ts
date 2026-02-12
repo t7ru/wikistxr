@@ -8,6 +8,30 @@ const styleElement = document.createElement("style");
 styleElement.textContent = WikitextEditor.getDefaultStyles();
 document.head.appendChild(styleElement);
 const editorHighlighter = new WikitextEditor();
+editorHighlighter.debug = (e) => {
+  switch (e.type) {
+    case "attach":
+    case "input":
+    case "keydown":
+    case "insertNewLine":
+    case "update:start":
+    case "update:domPatch":
+    case "update:restoreCursor":
+    case "computeLines:diff":
+    case "computeLines:tokenizeLine":
+    case "extractLines:start":
+    case "extractLines:processText":
+    case "extractLines:br":
+    case "extractLines:block":
+    case "extractLines:flush":
+    case "extractLines:done":
+    case "cursor:calc":
+    case "cursor:setInLine":
+    case "warn":
+      console.log("[Wikistxr Editor Debug]", e);
+      break;
+  }
+};
 const staticHighlighter = new WikitextHighlighter();
 const inputElement = document.getElementById("input") as HTMLTextAreaElement;
 const outputElement = document.getElementById("output") as HTMLDivElement;
@@ -30,7 +54,7 @@ const samples = {
 {{Victim
 | title = Patient Zero
 | image = <tabber>
-Game = 
+Game =
 |-|Artwork = [[File:Teaser2X.png]]
 </tabber>
 | description = Example
@@ -53,7 +77,7 @@ Game =
 Once a renowned doctor, '''Patient Zero''' dedicated his life to healing others. He published countless books and received the highest honors in his field. Yet now, he has become a shell of his former self. After the events that scarred him, the constant paranoia and anxiety deprives him of sleep. In the darkness, he swears he could see a smile staring back.
 
 == Appearance ==
-'''Patient Zero''' wears a blueish-white shirt featuring the classic Roblox "Spawn" symbol, with blood stained bandages on his right arm; in another depiction, he is shown wearing a white pinstripe suit. 
+'''Patient Zero''' wears a blueish-white shirt featuring the classic Roblox "Spawn" symbol, with blood stained bandages on his right arm; in another depiction, he is shown wearing a white pinstripe suit.
 
 == Gameplay ==
 === Official ===
