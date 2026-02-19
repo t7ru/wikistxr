@@ -81,6 +81,9 @@ const generateExtensionTagStyles = () => {
 };
 
 export const DEFAULT_STYLES = `
+  /* Editor lines */
+  .wt-line { white-space: pre-wrap; }
+
   /* Section headers */
   .wt-section-header { font-weight: bold; color: ${COLORS.black}; }
   ${generateSectionStyles()}
