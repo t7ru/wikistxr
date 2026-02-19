@@ -4,36 +4,33 @@ on:
   push:
     tags:
       - "*"
+  workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: read
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          registry-url: "https://registry.npmjs.org"
-      - run: npm ci
-      - run: npm version --no-git-tag-version ${{ github.event.release.tag_name }}
-      - run: npm run build
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
   notes:
-    needs: publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
+
+      - name: Determine tag
+        id: tag
+        run: |
+          if [ -n "${GITHUB_EVENT_RELEASE_TAG_NAME}" ]; then
+            echo "Using release tag: $GITHUB_EVENT_RELEASE_TAG_NAME"
+            echo "TAG=$GITHUB_EVENT_RELEASE_TAG_NAME" >> $GITHUB_ENV
+          else
+            LAST_TAG=$(git describe --tags --abbrev=0)
+            echo "No release tag found, falling back to last tag: $LAST_TAG"
+            echo "TAG=$LAST_TAG" >> $GITHUB_ENV
+          fi
+        env:
+          GITHUB_EVENT_RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
 
       - name: Build changelog
         id: changelog
@@ -41,13 +38,13 @@ jobs:
         with:
           mode: COMMIT
           configuration: .github/changelog-config.json
-          toTag: ${{ github.event.release.tag_name }}
+          toTag: ${{ env.TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ env.TAG }}
           body: ${{ steps.changelog.outputs.changelog }}
           make_latest: true
