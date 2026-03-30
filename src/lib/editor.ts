@@ -1,31 +1,7 @@
-/**
- * Incremental wikitext editor helper.
- * HEAVILY EXPERIMENTAL.
- *
- * Extends WikitextHighlighter to provide real-time syntax highlighting for editable wikitext.
- * Caches tokens and parser states to retokenize only changed lines while maintaining multiline
- * context (comments, tags, templates) across edits.
- *
- * @example
- * const editor = new WikitextEditor();
- * editor.attach(editableDiv);
- *
- * @example
- * const editor = new WikitextEditor({
- *   extensionTags: ['nowiki', 'ref', 'custom']
- * });
- * editor.attach(container);
- * editor.update(wikitextString);
- */
-import type { HighlightToken, HighlightConfig, TokenizerState } from "./types";
+import type { HighlightToken, HighlightConfig } from "./types";
 import { WikitextHighlighter } from "./highlighter";
 
-const initialState: TokenizerState = {
-  inMultilineComment: false,
-  commentBuffer: "",
-  inExtensionTag: null,
-  templateDepth: 0,
-};
+const initialState = 0;
 
 const EMPTY_PLACEHOLDER = "\u200B";
 const EMPTY_PLACEHOLDER_HTML = `<span class="wt-placeholder">${EMPTY_PLACEHOLDER}</span>`;
@@ -82,8 +58,8 @@ type EditorDebugEvent =
       isFirstLine: boolean;
       lineLength: number;
       lineSameAsCached: boolean;
-      stateBefore: TokenizerState;
-      stateAfter: TokenizerState;
+      stateBefore: number;
+      stateAfter: number;
       convergedAtLine: boolean;
     }
   | {
@@ -168,25 +144,10 @@ function nodeDebugName(node: Node | null): string {
   return `nodeType:${node.nodeType}`;
 }
 
-/**
- * Compare two TokenizerState objects for equality.
- * @param a - First state
- * @param b - Second state
- * @returns True if states are identical
- */
-function statesEqual(a: TokenizerState, b: TokenizerState): boolean {
-  return (
-    a.inMultilineComment === b.inMultilineComment &&
-    a.commentBuffer === b.commentBuffer &&
-    a.inExtensionTag === b.inExtensionTag &&
-    a.templateDepth === b.templateDepth
-  );
-}
-
 export class WikitextEditor extends WikitextHighlighter {
   private lastLines: string[] = [];
   private cachedTokens: HighlightToken[][] = [];
-  private cachedStates: TokenizerState[] = [];
+  private cachedStates: number[] = [];
   private container?: HTMLElement;
   private lineElements: HTMLElement[] = [];
   private inputHandler?: (event: Event) => void;
@@ -194,18 +155,6 @@ export class WikitextEditor extends WikitextHighlighter {
   private pasteHandler?: (event: ClipboardEvent) => void;
   private applyingUpdate = false;
 
-  /**
-   * Optional debug hook.
-   *
-   * If provided, the editor will emit structured debug events for:
-   * 1) DOM line extraction (`extractLinesFromDom`)
-   * 2) cursor offset calculation/restoration
-   * 3) incremental tokenization and convergence
-   * 4) DOM patch decisions in `update()`
-   *
-   * This is intentionally a function rather than `console.log` calls so one can
-   * route logs anywhere (console, file logger, UI panel, etc.).
-   */
   public debug?: (event: EditorDebugEvent) => void;
 
   private debugEmit(event: EditorDebugEvent): void {
@@ -214,43 +163,17 @@ export class WikitextEditor extends WikitextHighlighter {
     } catch {}
   }
 
-  /**
-   * Create a new WikitextEditor instance.
-   * @param config - Optional configuration for protocols, keywords, and tags
-   */
   constructor(config: HighlightConfig = {}) {
     super(config);
     this.resetCache();
   }
 
-  /**
-   * Reset all internal caches and tokenizer state to initial values.
-   *
-   * Call this before attaching to a new container or when starting a fresh edit session.
-   */
   public resetCache(): void {
-    this.tokenizer.reset();
     this.lastLines = [];
     this.cachedTokens = [];
-    this.cachedStates = [
-      {
-        inMultilineComment: false,
-        commentBuffer: "",
-        inExtensionTag: null,
-        templateDepth: 0,
-      },
-    ];
+    this.cachedStates = [initialState];
   }
 
-  /**
-   * Attach editor to a DOM element and enable live editing.
-   *
-   * Makes the container `contentEditable`, clears existing content, and sets up input listeners
-   * for automatic highlighting as the user types.
-   *
-   * @param container - The HTML element to attach to
-   * @throws Error if container is not a valid HTMLElement
-   */
   public attach(container: HTMLElement): void {
     if (this.container && this.inputHandler) {
       this.container.removeEventListener("input", this.inputHandler);
@@ -304,7 +227,6 @@ export class WikitextEditor extends WikitextHighlighter {
           inputEvent.inputType === "insertText" &&
           inputEvent.data?.length === 1
         ) {
-          // Heuristic to avoid the cursor "sticking" at 0 for single char insertions.
           cursorOffset = 1;
         } else {
           cursorOffset = cursorOffsetCalculated;
@@ -450,9 +372,6 @@ export class WikitextEditor extends WikitextHighlighter {
     this.container.addEventListener("paste", this.pasteHandler);
   }
 
-  /**
-   * Insert a new line at the current cursor position.
-   */
   private insertNewLine(): void {
     const selection = window.getSelection();
     if (!selection || !selection.rangeCount || !this.container) return;
@@ -482,16 +401,6 @@ export class WikitextEditor extends WikitextHighlighter {
     this.update(newText, cursorOffset + 1, "insertNewLine");
   }
 
-  /**
-   * Update editor with new wikitext content.
-   *
-   * Performs incremental retokenization of changed lines, patches the DOM,
-   * and restores the cursor position to minimize disruption during editing.
-   *
-   * @param text - The wikitext content to render
-   * @param cursorOffsetOverride - Optional cursor offset to restore after update
-   * @throws Error if attach() was not called first
-   */
   public update(
     text: string,
     cursorOffsetOverride: number | null = null,
@@ -564,41 +473,17 @@ export class WikitextEditor extends WikitextHighlighter {
     }
   }
 
-  /**
-   * Highlight wikitext without DOM attachment. Returns HTML string.
-   *
-   * Useful for generating highlighted output without the overhead of DOM management.
-   *
-   * @param text - The wikitext content to highlight
-   * @returns HTML string with syntax highlighting classes
-   */
   public override highlight(text: string): string {
     const lines = text.split("\n");
     const htmlLines = this.computeLines(lines);
     return htmlLines.join("\n");
   }
 
-  /**
-   * Tokenize wikitext into structured tokens. Updates internal cache.
-   *
-   * @param text - The wikitext content to tokenize
-   * @returns Array of token arrays (one per line)
-   */
   public override tokenize(text: string): HighlightToken[][] {
     this.computeLines(text.split("\n"));
     return this.cachedTokens;
   }
 
-  /**
-   * Compute line tokens with incremental retokenization.
-   *
-   * Finds the first changed line, retokenizes from that point forward,
-   * and stops early if the tokenizer state converges with the cached state
-   * (optimization for large files with localized edits).
-   *
-   * @param lines - Array of wikitext lines
-   * @returns Array of HTML strings (one per line)
-   */
   private computeLines(lines: string[]): string[] {
     this.debugEmit({
       type: "computeLines:start",
@@ -624,10 +509,10 @@ export class WikitextEditor extends WikitextHighlighter {
       return this.renderLines(this.cachedTokens);
     }
 
-    const startState =
+    let currentState =
       (start > 0 ? this.cachedStates[start] : initialState) ?? initialState;
 
-    if (!this.cachedStates[start] && start > 0) {
+    if (this.cachedStates[start] === undefined && start > 0) {
       this.debugEmit({
         type: "warn",
         message: "cachedStates[start] was undefined; reset to initialState",
@@ -640,28 +525,33 @@ export class WikitextEditor extends WikitextHighlighter {
       });
     }
 
-    this.tokenizer.setState(startState);
     const newTokens: HighlightToken[][] = this.cachedTokens.slice(0, start);
-    const newStates: TokenizerState[] = this.cachedStates.slice(0, start + 1);
+    const newStates: number[] = this.cachedStates.slice(0, start + 1);
 
     let converged = false;
 
     for (let i = start; i < lines.length; i++) {
-      const stateBefore = this.tokenizer.getState();
+      const stateBefore = currentState;
       const lineSameAsCached =
         i < this.lastLines.length && lines[i] === this.lastLines[i];
 
-      const tokens = this.tokenizer.tokenizeLine(lines[i], i === 0);
-      newTokens.push(tokens);
+      const result = this.tokenizer.tokenizeLine(
+        lines[i],
+        currentState,
+        i === 0,
+      );
+      newTokens.push(result.tokens);
 
-      const after = this.tokenizer.getState();
+      const after = result.newStateMask;
       newStates.push(after);
+      currentState = after;
 
       let convergedAtLine = false;
 
       if (lineSameAsCached) {
         const oldAfter = this.cachedStates[i + 1];
-        if (oldAfter && statesEqual(after, oldAfter)) {
+        // Integer comparison is massively faster than object deep equality!
+        if (oldAfter !== undefined && after === oldAfter) {
           newTokens.push(...this.cachedTokens.slice(i + 1));
           newStates.push(...this.cachedStates.slice(i + 2));
           converged = true;
@@ -696,16 +586,7 @@ export class WikitextEditor extends WikitextHighlighter {
     return this.renderLines(newTokens);
   }
 
-  /**
-   * Get cursor offset as character count from container start.
-   *
-   * Calculates the absolute position of the current cursor within the container's text content.
-   *
-   * @param range - The current DOM Range from Selection
-   * @param lineElements - Array of current line elements
-   * @param lineTexts - Array of current line texts
-   * @returns Character offset from container start, including newlines
-   */
+  // NOTE: DOM manipulation & cursor restoration logic below is left functionally identical
   private getCursorOffsetFromElements(
     range: Range,
     lineElements: HTMLElement[],
@@ -748,14 +629,6 @@ export class WikitextEditor extends WikitextHighlighter {
     return offset;
   }
 
-  /**
-   * Restore cursor position by character offset.
-   *
-   * Places the cursor at a specific character position within the container,
-   * even after the DOM has been updated. Accounts for implicit newlines between lines.
-   *
-   * @param offset - Character offset from container start, including newlines
-   */
   private restoreCursorOffset(offset: number): void {
     const selection = window.getSelection();
     if (!selection || !this.container) return;
@@ -808,12 +681,6 @@ export class WikitextEditor extends WikitextHighlighter {
     selection.addRange(fallbackRange);
   }
 
-  /**
-   * Set cursor at a specific offset within a line element.
-   *
-   * @param lineEl - The line HTMLElement
-   * @param innerOffset - Offset within the normalized line text
-   */
   private setCursorInLine(lineEl: HTMLElement, innerOffset: number): void {
     const selection = window.getSelection();
     if (!selection) return;
@@ -985,8 +852,6 @@ export class WikitextEditor extends WikitextHighlighter {
         continue;
       }
       if (tag === "div" || tag === "p" || tag === "li") {
-        // innerText adds trailing \n for trailing <br> in otherwise empty blocks;
-        // strip it to avoid double-counting empty lines (e.g. <div><br></div>).
         let rawText = node.innerText || "";
         if (rawText.endsWith("\n")) rawText = rawText.slice(0, -1);
 
@@ -997,13 +862,10 @@ export class WikitextEditor extends WikitextHighlighter {
           emittedLineIndex: lines.length,
         });
 
-        // Flush any preceding inline content as its own line before the block.
         if (buffer.length > 0) flush();
         processText(rawText);
         flush();
 
-        // Skip descendants cuz innerText already captured them and continue
-        // traversal up through ancestors instead of breaking prematurely.
         let next: Node | null = walker.nextSibling();
         while (!next && walker.parentNode()) {
           next = walker.nextSibling();

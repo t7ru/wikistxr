@@ -1,28 +1,20 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
+import wasm from "vite-plugin-wasm";
+import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
+  plugins: [wasm(), topLevelAwait()],
   build: {
     lib: {
       entry: resolve(__dirname, "src/lib/index.ts"),
       name: "wikistxr",
+      fileName: "index",
+      formats: ["es"],
     },
-    rollupOptions: {
-      output: [
-        {
-          format: "es",
-          dir: "dist/esm",
-          entryFileNames: "[name].js",
-          exports: "named",
-        },
-        {
-          format: "cjs",
-          dir: "dist/cjs",
-          entryFileNames: "[name].js",
-          exports: "named",
-        },
-      ],
-    },
+    outDir: "dist",
+    emptyOutDir: true,
     sourcemap: true,
   },
+  assetsInclude: ["**/*.wasm"],
 });

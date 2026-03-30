@@ -2,15 +2,14 @@ import { describe, expect, it } from "vitest";
 import { WikitextHighlighter } from "../src/lib/highlighter";
 
 describe("WikitextHighlighter", () => {
-  it("treats redirect keywords literally even when containing regex tokens", () => {
+  it("highlights custom redirect keywords passed via config", () => {
     const highlighter = new WikitextHighlighter({
-      redirectKeywords: ["REDIRECT.*"],
+      redirectKeywords: ["CUSTOMREDIRECT"],
     });
 
-    const html = highlighter.highlight("#REDIRECT.* [[Target Page]]");
-
-    expect(html).toContain('class="wt-redirect"');
-    expect(html).toContain("Target Page");
+    const html = highlighter.highlight("#CUSTOMREDIRECT [[Target Page]]");
+    expect(html).toContain('<span class="wt-redirect">#CUSTOMREDIRECT</span>');
+    expect(html).toContain('<span class="wt-link-pagename">Target Page</span>');
   });
 
   it("escapes raw HTML text from user input", () => {

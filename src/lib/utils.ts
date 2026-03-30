@@ -3,8 +3,6 @@
  * Includes HTML escaping, span creation, and bracket matching for parsing wikitext syntax.
  */
 
-import type { ClosingResult } from "./types";
-
 /**
  * Escape HTML special characters to prevent injection.
  *
@@ -60,53 +58,4 @@ export function escapeRegExp(value: string): string {
 export function createSpan(text: string, className: string): string {
   const escaped = escapeHtml(text);
   return className ? `<span class="${className}">${escaped}</span>` : escaped;
-}
-
-/**
- * Find the first complete balanced pair of opening and closing delimiters.
- *
- * Handles nested delimiters (e.g., [[ [[ ]] ]]) by tracking depth.
- * Useful for matching wikitext brackets like [[...]], {{...}}, etc.
- *
- * @param text - The text to search
- * @param open - Opening delimiter (e.g., "[[")
- * @param close - Closing delimiter (e.g., "]]")
- * @returns Object with content (substring including delimiters) and end position, or null if unbalanced
- * @example
- * findClosing("[[link|text]] after", "[[", "]]")
- * // Returns: { content: "[[link|text]]", end: 14 }
- *
- * @example
- * findClosing("[[unclosed", "[[", "]]")
- * // Returns: null
- */
-export function findClosing(
-  text: string,
-  open: string,
-  close: string,
-): ClosingResult | null {
-  let depth = 0;
-
-  for (let i = 0; i < text.length; i++) {
-    if (text.slice(i, i + open.length) === open) {
-      depth++;
-      i += open.length - 1;
-      continue;
-    }
-
-    if (text.slice(i, i + close.length) === close) {
-      depth--;
-      if (depth === 0) {
-        const endPos = i + close.length;
-        return {
-          content: text.slice(0, endPos),
-          end: endPos,
-        };
-      }
-      i += close.length - 1;
-      continue;
-    }
-  }
-
-  return null;
 }

@@ -1,9 +1,10 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./demo",
-    "outDir": "./dist/demo",
-    "noEmit": true
+    "baseUrl": ".",
+    "paths": {
+      "wikistxr": ["./dist/index.js"],
+    },
   },
-  "include": ["src/demo/**/*"]
+  "include": ["src/demo/**/*"],
 }

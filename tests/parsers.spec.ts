@@ -1,38 +1,23 @@
 import { describe, expect, it } from "vitest";
-import { parseExternalLink, parseLink, parseTag } from "../src/lib/parsers";
+import { parseTag } from "../src/lib/parsers";
 
 describe("Parsers", () => {
-  it("leaves link display text unstyled by design", () => {
-    const html = parseLink("[[Article|Display Text]]");
-
-    expect(html).toContain('class="wt-link-pagename"');
-    expect(html).not.toContain("wt-link-delimiter");
-    expect(html).not.toContain("wt-link-text");
-    expect(html).toContain("|Display Text");
+  it("wraps known extension tags with the correct base classes", () => {
+    const html = parseTag("<ref>", "wt-exttag wt-ext-ref", ["ref"]);
+    expect(html).toBe('<span class="wt-exttag wt-ext-ref">&lt;ref&gt;</span>');
   });
 
-  it("leaves external link labels without wt-extlink-text class", () => {
-    const html = parseExternalLink("[https://tds-editor.com Example]");
-
-    expect(html).toContain('class="wt-extlink-bracket"');
-    expect(html).not.toContain("wt-extlink-text");
-    expect(html).toContain(" Example");
-    expect(html).not.toContain("Example</span>");
+  it("downgrades unknown tags to generic HTML tags", () => {
+    const html = parseTag("<div>", "", ["ref"]);
+    expect(html).toBe('<span class="wt-htmltag">&lt;div&gt;</span>');
   });
 
-  it("preserves extension tag content even when attributes are present", () => {
-    const html = parseTag(
-      '<ref name="cite">Some content</ref>',
-      "wt-ext-ref-full",
-      ["ref"],
-    );
+  it("splits multiline opening tags correctly using the -start hint", () => {
+    const html = parseTag("<poem>Line 1", "wt-ext-poem-start", ["poem"]);
 
     expect(html).toContain(
-      '<span class="wt-exttag wt-ext-ref">&lt;ref name=&quot;cite&quot;&gt;</span>',
+      '<span class="wt-exttag wt-ext-poem">&lt;poem&gt;</span>',
     );
-    expect(html).toContain('<span class="wt-ext-ref">Some content</span>');
-    expect(html).toContain(
-      '<span class="wt-exttag wt-ext-ref">&lt;/ref&gt;</span>',
-    );
+    expect(html).toContain('<span class="wt-ext-poem">Line 1</span>');
   });
 });

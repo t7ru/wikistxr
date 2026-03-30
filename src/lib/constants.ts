@@ -4,7 +4,7 @@
  * Should make as much classes as possible so that users can config through CSS.
  */
 export const DEFAULT_URL_PROTOCOLS =
-  /^(?:ftp|ftps|git|gopher|http|https|irc|ircs|mms|nntp|redis|sftp|ssh|svn|telnet|worldwind)(?=[^\s\u00a0{[\]<>~).,'])/i;
+  "bitcoin:|ftp://|ftps://|geo:|git://|gopher://|http://|https://|irc://|ircs://|magnet:|mailto:|matrix:|mms://|news:|nntp://|redis://|sftp://|sip:|sips:|sms:|ssh://|svn://|tel:|telnet://|urn:|worldwind://|xmpp:|//";
 
 export const DEFAULT_REDIRECT_KEYWORDS = [
   "REDIRECT",

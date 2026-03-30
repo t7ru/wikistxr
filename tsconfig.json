@@ -7,15 +7,15 @@
     "declarationMap": true,
     "emitDeclarationOnly": true,
     "outDir": "./dist",
-    "rootDir": "./src/lib",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
   },
-  "include": ["src/lib/**/*"],
-  "exclude": ["demo", "node_modules", "dist"]
+  "include": ["src/lib/**/*", "wasm/**/*"],
+  "exclude": ["demo", "node_modules", "dist"],
 }

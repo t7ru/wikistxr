@@ -8,20 +8,8 @@ export interface HighlightToken {
 }
 
 export interface HighlightConfig {
-  urlProtocols?: RegExp;
-  redirectKeywords?: string[];
-  extensionTags?: string[];
-  contentPreservingTags?: string[];
-}
-
-export interface ClosingResult {
-  content: string;
-  end: number;
-}
-
-export interface TokenizerState {
-  inMultilineComment: boolean;
-  commentBuffer: string;
-  inExtensionTag: string | null;
-  templateDepth: number;
+  urlProtocols?: RegExp | string;
+  redirectKeywords?: string[] | string;
+  extensionTags?: string[] | string;
+  contentPreservingTags?: string[] | string;
 }
