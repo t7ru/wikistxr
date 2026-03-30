@@ -8,6 +8,7 @@ const styleElement = document.createElement("style");
 styleElement.textContent = WikitextEditor.getDefaultStyles();
 document.head.appendChild(styleElement);
 const editorHighlighter = new WikitextEditor();
+// @ts-ignore
 editorHighlighter.debug = (e) => {
   switch (e.type) {
     case "attach":
