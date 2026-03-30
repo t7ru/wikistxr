@@ -5,7 +5,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/lib/index.ts"),
-      name: "Wikistxr",
+      name: "wikistxr",
     },
     rollupOptions: {
       output: [
