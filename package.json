@@ -22,7 +22,8 @@
     "build:wasm": "./build.sh",
     "build:vite": "vite build --config vite.config.ts",
     "build:types": "tsc --project tsconfig.json",
-    "copy:wasm": "cp wasm/*.wasm wasm/*.js wasm/*.d.ts dist/ 2>/dev/null || true"
+    "copy:wasm": "cp wasm/*.wasm wasm/*.js wasm/*.d.ts dist/ 2>/dev/null || true",
+    "format": "prettier --write ."
   },
   "repository": {
     "type": "git",

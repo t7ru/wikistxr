@@ -113,7 +113,7 @@ impl WikitextTokenizer {
 
     /// Tokenize one line of wikitext
     ///
-    /// Returns `[state_out, start₁, end₁, cls₁, ...]` where offsets are UTF-16 units.
+    /// Returns `[state_out, start_, end_1, cls_1, ...]` where offsets are UTF-16 units.
     /// Pass `state_out` back as `state` on the next line.
     pub fn tokenize_line(&self, line: &str, mut state: u32, is_first: bool) -> Vec<u32> {
         let bytes = line.as_bytes();
@@ -614,7 +614,6 @@ impl WikitextTokenizer {
             }
 
             // Magic word  __UPPERCASEWORD__
-            // let-chains collapse three levels of nesting into one condition.
             if rb.starts_with(b"__")
                 && rem.len() > 4
                 && let Some(ep) = rem[2..].find("__")

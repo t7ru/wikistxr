@@ -3,8 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "wikistxr": ["./dist/index.js"],
-    },
+      "wikistxr": ["./dist/index.js"]
+    }
   },
-  "include": ["demo/**/*"],
+  "include": ["demo/**/*"]
 }

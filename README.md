@@ -24,8 +24,8 @@ npm i wikistxr
 
 **Static, full-pass syntax highlighting**
 
-  - Tokenizes input in one pass.
-  - Renders to HTML strings.
+- Tokenizes input in one pass.
+- Renders to HTML strings.
 
 ```javascript
 import { WikitextHighlighter } from "wikistxr";
@@ -38,14 +38,14 @@ const html = highlighter.highlight(wikitextString);
 
 **Incremental, live editing with DOM patching**
 
-  - Caches tokenizer state and tokens per line.
-  - Handles cursor persistence and DOM synchronization.
+- Caches tokenizer state and tokens per line.
+- Handles cursor persistence and DOM synchronization.
 
 ```javascript
 import { WikitextEditor } from "wikistxr";
 
 const editor = new WikitextEditor();
-editor.attach(editableDiv); 
+editor.attach(editableDiv);
 editor.update(wikitextString);
 ```
 
@@ -58,7 +58,7 @@ const config = {
   urlProtocols: "http|https|mailto",
   redirectKeywords: ["REDIRECT", "WEITERLEITUNG"],
   extensionTags: ["nowiki", "ref", "gallery"],
-  contentPreservingTags: ["nowiki", "pre"]
+  contentPreservingTags: ["nowiki", "pre"],
 };
 
 const highlighter = new WikitextHighlighter(config);
@@ -74,7 +74,7 @@ const styles = WikitextHighlighter.getDefaultStyles();
 
 ```bash
 # Build Rust core and TypeScript bundles
-bun run build 
+bun run build
 
 # Run development demo
 bun run dev

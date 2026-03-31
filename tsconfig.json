@@ -14,8 +14,8 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": true
   },
   "include": ["src/lib/**/*"],
-  "exclude": ["demo", "node_modules", "dist", "wasm"],
+  "exclude": ["demo", "node_modules", "dist", "wasm"]
 }
