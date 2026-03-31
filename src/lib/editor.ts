@@ -144,8 +144,10 @@ export class WikitextEditor extends WikitextHighlighter {
 
   public debug?: (event: EditorDebugEvent) => void;
 
-  private debugEmit(event: EditorDebugEvent): void {
-    if (this.debug) this.debug(event);
+  private debugEmit(eventFactory: () => EditorDebugEvent): void {
+    if (this.debug) {
+      this.debug(eventFactory());
+    }
   }
 
   public resetCache(): void {
@@ -170,17 +172,17 @@ export class WikitextEditor extends WikitextHighlighter {
     this.lineElements = [];
     this.resetCache();
 
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "attach",
       contentEditable: String(this.container.contentEditable),
-    });
+    }));
 
     this.inputHandler = (event: Event) => {
       if (this.applyingUpdate)
-        return this.debugEmit({
+        return this.debugEmit(() => ({
           type: "warn",
           message: "input ignored (applyingUpdate)",
-        });
+        }));
 
       const inputEvent = event as InputEvent;
       const domLines = this.readDomLines();
@@ -208,7 +210,7 @@ export class WikitextEditor extends WikitextHighlighter {
             : cursorOffsetCalculated;
       }
 
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "input",
         inputType: inputEvent.inputType,
         data: inputEvent.data,
@@ -216,7 +218,7 @@ export class WikitextEditor extends WikitextHighlighter {
         payloadLength: payload.length,
         cursorOffsetCalculated,
         cursorOffsetUsed: cursorOffset,
-      });
+      }));
       this.update(payload, cursorOffset, "input");
     };
 
@@ -257,7 +259,7 @@ export class WikitextEditor extends WikitextHighlighter {
         }
       }
 
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "keydown",
         key: event.key,
         shiftKey: event.shiftKey,
@@ -265,7 +267,7 @@ export class WikitextEditor extends WikitextHighlighter {
         altKey: event.altKey,
         metaKey: event.metaKey,
         prevented,
-      });
+      }));
     };
 
     this.pasteHandler = (event: ClipboardEvent) => {
@@ -307,7 +309,7 @@ export class WikitextEditor extends WikitextHighlighter {
       const newText =
         currentText.slice(0, selStart) + pastedText + currentText.slice(selEnd);
 
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "warn",
         message: "paste intercepted",
         data: {
@@ -317,7 +319,7 @@ export class WikitextEditor extends WikitextHighlighter {
           resultLength: newText.length,
           newCursorOffset: selStart + pastedText.length,
         },
-      });
+      }));
       this.update(newText, selStart + pastedText.length, "input");
     };
 
@@ -340,14 +342,14 @@ export class WikitextEditor extends WikitextHighlighter {
     const newText =
       text.slice(0, cursorOffset) + "\n" + text.slice(cursorOffset);
 
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "insertNewLine",
       cursorOffset,
       beforeLength: text.length,
       afterLength: newText.length,
       beforePreview: previewText(text),
       afterPreview: previewText(newText),
-    });
+    }));
     this.update(newText, cursorOffset + 1, "insertNewLine");
   }
 
@@ -358,22 +360,22 @@ export class WikitextEditor extends WikitextHighlighter {
   ): void {
     if (!this.container) throw new Error("Call attach() first");
     if (this.applyingUpdate)
-      return this.debugEmit({
+      return this.debugEmit(() => ({
         type: "warn",
         message: "update ignored (applyingUpdate)",
         data: { reason },
-      });
+      }));
 
     this.applyingUpdate = true;
     try {
       const lines = text.split("\n");
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "update:start",
         reason,
         textLength: text.length,
         lines: lines.length,
         cursorOffsetOverride,
-      });
+      }));
 
       const htmlLines = this.computeLines(lines);
 
@@ -420,23 +422,23 @@ export class WikitextEditor extends WikitextHighlighter {
   }
 
   private computeLines(lines: string[]): string[] {
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "computeLines:start",
       lines: lines.length,
       lastLines: this.lastLines.length,
-    });
+    }));
 
     let start = 0;
     const minLen = Math.min(lines.length, this.lastLines.length);
     while (start < minLen && lines[start] === this.lastLines[start]) start++;
 
     if (start === lines.length && lines.length === this.lastLines.length) {
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "computeLines:diff",
         startLineIndex: start,
         minLen,
         wasNoop: true,
-      });
+      }));
       return this.renderLines(this.cachedTokens);
     }
 
@@ -470,7 +472,7 @@ export class WikitextEditor extends WikitextHighlighter {
         converged = true;
       }
 
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "computeLines:tokenizeLine",
         i,
         isFirstLine: i === 0,
@@ -480,7 +482,7 @@ export class WikitextEditor extends WikitextHighlighter {
         stateBefore: newStates[newStates.length - 2],
         stateAfter: currentState,
         convergedAtLine: converged,
-      });
+      }));
       if (converged) break;
     }
 
@@ -518,14 +520,14 @@ export class WikitextEditor extends WikitextHighlighter {
     preCaretRange.setEnd(range.endContainer, range.endOffset);
     offset += this.normalizeLineText(preCaretRange.toString()).length;
 
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "cursor:calc",
       lineIndex,
       offsetInLine: offset,
       absoluteOffset: offset,
       rangeStartNode: nodeDebugName(range.startContainer),
       rangeStartOffset: range.startOffset,
-    });
+    }));
     return offset;
   }
 
@@ -539,25 +541,25 @@ export class WikitextEditor extends WikitextHighlighter {
       const lineLength = this.lastLines[i] ? this.lastLines[i].length : 0;
 
       if (offset <= currentPos + lineLength) {
-        this.debugEmit({
+        this.debugEmit(() => ({
           type: "update:restoreCursor",
           requestedOffset: offset,
           resolvedLineIndex: i,
           resolvedInnerOffset: offset - currentPos,
           lineTextLength: lineLength,
-        });
+        }));
         return this.setCursorInLine(lineEl, offset - currentPos);
       }
       currentPos += lineLength + 1;
     }
 
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "update:restoreCursor",
       requestedOffset: offset,
       resolvedLineIndex: null,
       resolvedInnerOffset: null,
       lineTextLength: null,
-    });
+    }));
 
     const fallbackRange = document.createRange();
     const lastChild = this.container.lastChild;
@@ -600,12 +602,12 @@ export class WikitextEditor extends WikitextHighlighter {
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);
-        return this.debugEmit({
+        return this.debugEmit(() => ({
           type: "cursor:setInLine",
           requestedInnerOffset: innerOffset,
           walkedTextNodes,
           fellBackToEnd: false,
-        });
+        }));
       }
 
       if (currentInner + normalizedLength >= innerOffset) {
@@ -621,12 +623,12 @@ export class WikitextEditor extends WikitextHighlighter {
         range.collapse(true);
         selection.removeAllRanges();
         selection.addRange(range);
-        return this.debugEmit({
+        return this.debugEmit(() => ({
           type: "cursor:setInLine",
           requestedInnerOffset: innerOffset,
           walkedTextNodes,
           fellBackToEnd: false,
-        });
+        }));
       }
       currentInner += normalizedLength;
     }
@@ -636,12 +638,12 @@ export class WikitextEditor extends WikitextHighlighter {
     range.collapse(false);
     selection.removeAllRanges();
     selection.addRange(range);
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "cursor:setInLine",
       requestedInnerOffset: innerOffset,
       walkedTextNodes,
       fellBackToEnd: true,
-    });
+    }));
   }
 
   private normalizeLineText(text: string): string {
@@ -653,36 +655,36 @@ export class WikitextEditor extends WikitextHighlighter {
 
   private readDomLines(): string[] {
     if (!this.container) return [];
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "extractLines:start",
       containerChildCount: this.container.childNodes.length,
       containerTextContentLength: (this.container.textContent ?? "").length,
-    });
+    }));
 
     const lines: string[] = [];
     let buffer = "";
 
     const flush = () => {
       const normalized = this.normalizeLineText(buffer);
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "extractLines:flush",
         emittedLineIndex: lines.length,
         emittedLineLength: normalized.length,
         emittedLineSample: previewText(normalized),
-      });
+      }));
       lines.push(normalized);
       buffer = "";
     };
 
     const processText = (text: string) => {
       const pieces = this.normalizeLineText(text).split(/\n/);
-      this.debugEmit({
+      this.debugEmit(() => ({
         type: "extractLines:processText",
         rawLength: text.length,
         normalizedLength: pieces.join("\n").length,
         splitCount: pieces.length,
         sample: previewText(pieces.join("\n")),
-      });
+      }));
       for (let i = 0; i < pieces.length; i++) {
         if (i > 0) flush();
         buffer += pieces[i];
@@ -701,21 +703,21 @@ export class WikitextEditor extends WikitextHighlighter {
       } else if (node instanceof HTMLElement) {
         const tag = node.tagName.toLowerCase();
         if (tag === "br") {
-          this.debugEmit({
+          this.debugEmit(() => ({
             type: "extractLines:br",
             bufferLengthBeforeFlush: buffer.length,
             emittedLineIndex: lines.length,
-          });
+          }));
           flush();
         } else if (tag === "div" || tag === "p" || tag === "li") {
           let rawText = node.textContent || "";
           if (rawText.endsWith("\n")) rawText = rawText.slice(0, -1);
-          this.debugEmit({
+          this.debugEmit(() => ({
             type: "extractLines:block",
             tag,
             innerTextLength: rawText.length,
             emittedLineIndex: lines.length,
-          });
+          }));
 
           if (buffer.length > 0) flush();
           processText(rawText);
@@ -731,11 +733,11 @@ export class WikitextEditor extends WikitextHighlighter {
     }
 
     if (buffer.length > 0 || lines.length === 0) flush();
-    this.debugEmit({
+    this.debugEmit(() => ({
       type: "extractLines:done",
       lines: lines.length,
       lastLineLength: lines.length ? lines[lines.length - 1].length : 0,
-    });
+    }));
     return lines;
   }
 }
