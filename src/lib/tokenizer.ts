@@ -48,7 +48,7 @@ const CLASS_MAP = [
   "wt-extlink", // CLS_ELINK_PROTO
   "wt-extlink", // CLS_ELINK_URL
   "", // CLS_ELINK_LABEL
-  "wt-free-extlink",
+  "wt-free-extlink", // CLS_FREE_URL
   "wt-htmltag",
   "wt-exttag",
   "wt-ext-content",
@@ -66,7 +66,6 @@ export class WikitextTokenizer {
   private engine: WasmTokenizer;
   private extensionTags: string[];
   private contentTags: string[];
-  private urlRegex: RegExp | null = null;
 
   constructor(
     urlProtocols: RegExp | string = DEFAULT_URL_PROTOCOLS,
@@ -78,7 +77,7 @@ export class WikitextTokenizer {
       typeof urlProtocols === "string" ? urlProtocols : urlProtocols.source;
 
     safeUrlProtos = safeUrlProtos
-      .replace(/\(\?\=.*?\)/g, "")
+      .replace(/\(\?[=!<].*?\)/g, "")
       .replace(/^\^/, "")
       .replace(/\\\//g, "/");
 
@@ -92,15 +91,6 @@ export class WikitextTokenizer {
       ? contentTags
       : String(contentTags).split(",");
 
-    try {
-      this.urlRegex = new RegExp(
-        `(?:${safeUrlProtos})[^\\s\\u00a0{\\[<>~]+`,
-        "g",
-      );
-    } catch (e) {
-      console.error("Failed to compile URL regex", e);
-    }
-
     this.engine = new WasmTokenizer(
       safeUrlProtos,
       safeRedirects,
@@ -109,95 +99,58 @@ export class WikitextTokenizer {
     );
   }
 
-  private parsePlaintextUrls(
-    text: string,
-    baseClass: string,
-    tokens: HighlightToken[],
-  ) {
-    if (!this.urlRegex) return tokens.push({ text, className: baseClass });
-
-    this.urlRegex.lastIndex = 0;
-    let lastIdx = 0,
-      match;
-
-    while ((match = this.urlRegex.exec(text)) !== null) {
-      if (match.index > lastIdx) {
-        tokens.push({
-          text: text.substring(lastIdx, match.index),
-          className: baseClass,
-        });
-      }
-
-      let cleanMatch = match[0],
-        endPunctuation = "";
-      const trailingMatch = cleanMatch.match(/[.,')]+$/);
-
-      if (trailingMatch) {
-        endPunctuation = trailingMatch[0];
-        cleanMatch = cleanMatch.slice(0, -endPunctuation.length);
-        this.urlRegex.lastIndex -= endPunctuation.length;
-      }
-
-      tokens.push({ text: cleanMatch, className: "wt-free-extlink" });
-      if (endPunctuation)
-        tokens.push({ text: endPunctuation, className: baseClass });
-
-      lastIdx = match.index + cleanMatch.length + endPunctuation.length;
-    }
-
-    if (lastIdx < text.length) {
-      tokens.push({ text: text.substring(lastIdx), className: baseClass });
-    }
-  }
-
   tokenizeLine(
     lineText: string,
     stateMask: number,
     isFirst: boolean,
   ): { newStateMask: number; tokens: HighlightToken[] } {
-    if (!this.engine)
+    if (!this.engine) {
       return {
         newStateMask: stateMask,
         tokens: [{ text: lineText, className: "" }],
       };
+    }
 
     const result = this.engine.tokenize_line(lineText, stateMask, isFirst);
     const tokens: HighlightToken[] = [];
     const incomingCi = (stateMask & (0x3f << 1)) >> 1;
 
     for (let i = 1; i < result.length; i += 3) {
-      const start = result[i],
-        end = result[i + 1],
-        classId = result[i + 2];
+      const start = result[i];
+      const end = result[i + 1];
+      const classId = result[i + 2];
+
       if (start === end) continue;
 
       let className = CLASS_MAP[classId] || "";
       const text = lineText.substring(start, end);
 
-      if (classId === 0) {
-        this.parsePlaintextUrls(text, className, tokens);
-        continue;
-      }
-
-      if (classId === 34) {
-        const match = text.match(/^<\/?([a-z][^\s>\/]*)/i);
-        if (match) {
-          const tagName = match[1].toLowerCase();
-          className = text.startsWith("</")
-            ? `wt-exttag wt-ext-${tagName}`
-            : text.endsWith(`</${tagName}>`)
-              ? `wt-ext-${tagName}-full`
-              : this.extensionTags.includes(tagName)
-                ? `wt-exttag wt-ext-${tagName}`
-                : "wt-htmltag";
-        }
-      } else if (classId === 35) {
+      // CLS_EXT_CONTENT
+      if (classId === 35) {
         const match = text.match(/^<([a-z][^\s>\/]*)/i);
         className = match
           ? `wt-ext-${match[1].toLowerCase()}-start`
           : incomingCi > 0 && incomingCi <= this.contentTags.length
             ? `wt-ext-${this.contentTags[incomingCi - 1]}`
             : "wt-ext-content";
+      }
+      // 33 = CLS_HTML_TAG; 34 = CLS_EXT_TAG
+      else if (classId === 33 || classId === 34) {
+        const match = text.match(/^<\/?([a-z][^\s>\/]*)/i);
+        if (match) {
+          const tagName = match[1].toLowerCase();
+          if (classId === 34) {
+            className = text.startsWith("</")
+              ? `wt-exttag wt-ext-${tagName}`
+              : text.endsWith(`</${tagName}>`)
+                ? `wt-ext-${tagName}-full`
+                : this.extensionTags.includes(tagName)
+                  ? `wt-exttag wt-ext-${tagName}`
+                  : "wt-htmltag";
+          } else {
+            className = "wt-htmltag";
+          }
+        }
       }
 
       tokens.push({ text, className });

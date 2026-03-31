@@ -84,7 +84,7 @@ pub struct WikitextTokenizer {
 impl WikitextTokenizer {
     #[wasm_bindgen(constructor)]
     pub fn new(url_protocols: &str, redirect_kw: &str, ext_tags: &str, content_tags: &str) -> Self {
-        let url_re = Regex::new(&format!("^(?:{url_protocols})"))
+        let url_re = Regex::new(&format!("(?i-u)^(?:{url_protocols})")) // unicode-case never
             .unwrap_or_else(|_| Regex::new("a^").unwrap());
 
         let safe_redirects = redirect_kw
@@ -280,16 +280,20 @@ impl WikitextTokenizer {
             let tdepth = (state & S_TDEP_M) >> S_TDEP_SH;
             let text_cls = if tdepth > 0 { CLS_TMPL_TEXT } else { CLS_TEXT };
 
-            if rb[0].is_ascii_alphabetic() && self.url_re.is_match(rem) {
+            if rb.first().map(|b| b.is_ascii_alphabetic()).unwrap_or(false)
+                && self.url_re.is_match(rem)
+            {
                 let raw_end = rem
                     .find(|c: char| {
                         c.is_whitespace() || matches!(c, '\u{00a0}' | '{' | '[' | '<' | '>' | '~')
                     })
                     .unwrap_or(rem.len());
+
                 let mut ue = raw_end;
-                while ue > 0 && matches!(bytes[i + ue - 1], b')' | b'.' | b',' | b'\'') {
+                while ue > 0 && matches!(rb[ue - 1], b')' | b'.' | b',' | b'\'') {
                     ue -= 1;
                 }
+
                 if ue > 0 {
                     let eu = u + u16len(&rem[..ue]);
                     emit!(u, eu, CLS_FREE_URL);
