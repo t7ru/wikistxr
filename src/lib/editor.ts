@@ -536,9 +536,7 @@ export class WikitextEditor extends WikitextHighlighter {
     let currentPos = 0;
     for (let i = 0; i < this.lineElements.length; i++) {
       const lineEl = this.lineElements[i];
-      const lineLength = this.normalizeLineText(
-        lineEl.textContent ?? "",
-      ).length;
+      const lineLength = this.lastLines[i] ? this.lastLines[i].length : 0;
 
       if (offset <= currentPos + lineLength) {
         this.debugEmit({
