@@ -247,7 +247,8 @@ function highlightText() {
   } catch (error) {
     console.error("[Test Page] Error:", error);
     const message = `Error: ${(error as Error).message}`;
-    outputElement.innerHTML = `<span style="color: red;">${message}</span>`;
+    outputElement.innerHTML = '<span style="color: red;"></span>';
+    outputElement.querySelector("span")!.textContent = message;
     if (currentMode === "highlighter") {
       statsElement.textContent = `[Highlighter] ✗ ${message}`;
     }
