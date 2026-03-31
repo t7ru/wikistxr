@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "vite --config vite.config.demo.ts",
     "build:wasm": "./build.sh",
-    "build": "npm run build:wasm && vite build --config vite.config.ts && tsc --project tsconfig.json && npm run fix-types",
+    "build": "bun run build:wasm && vite build --config vite.config.ts && tsc --project tsconfig.json && bun run fix-types",
     "build:demo": "vite build --config vite.config.demo.ts",
     "preview": "vite preview --config vite.config.demo.ts",
     "fix-types": "mv dist/src/lib/* dist/ && rm -rf dist/src",
@@ -39,14 +39,15 @@
   "author": "t7ru",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^24.9.2",
     "jsdom": "^27.1.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vite": "^7.1.12",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.6.0",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "@types/bun": "latest"
   },
-  "homepage": "https://wikistxr.t7ru.link"
+  "homepage": "https://wikistxr.t7ru.link",
+  "private": true
 }
