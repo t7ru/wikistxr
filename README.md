@@ -1,118 +1,84 @@
-<div align="center"><img src="https://raw.githubusercontent.com/t7ru/wikistxr/refs/heads/main/demo/logo.png" width="222" alt="wikistxr logo">
+<div align="center">
+<img src="https://raw.githubusercontent.com/t7ru/wikistxr/refs/heads/master/demo/logo.png" width="222" alt="wikistxr logo">
 
 # wikistxr</div>
 
-A lightweight and fast library for **Wiki**text that has a **s**yn**t**a**x** highligh**ter** and edi**tor** written in TypeScript.
+A blazingly fast library for **Wiki**text that has a **s**yn**t**a**x** highligh**ter** and edi**tor** written in Rust and TypeScript.
 
-## Features
+## Neat Little Facts About It
 
-- Very fast!
-- Easily portable to every modern browser environment
-- Wikitext-aware tokenization (templates, links, tables, comments, tags, magic words, etc.)
+- Supports all wikitext syntax.
+- SIMD-accelerated tokenization via Rust.
 - Configurable protocols, redirect keywords, extension tags, etc.
-- HTML output with granular CSS classes (`getDefaultStyles()` provided)
-- Incremental mode caches line tokens and state for fast live editing
+- Semantic CSS classes via `getDefaultStyles()`.
 
 ## Installation
 
 ```bash
-npm install wikistxr
+npm i wikistxr
 ```
 
-or
-
-```html
-<script src="https://cdn.jsdelivr.net/npm/wikistxr@latest/dist/index.min.js"></script>
-```
-
-## Two Modes
+## Usage
 
 ### WikitextHighlighter
 
 **Static, full-pass syntax highlighting**
 
-- Tokenizes entire wikitext input in one pass
-- Renders to HTML string with CSS classes
-- No DOM management or cursor tracking
-- Ideal for read-only display like code previews
+  - Tokenizes input in one pass.
+  - Renders to HTML strings.
 
 ```javascript
 import { WikitextHighlighter } from "wikistxr";
 
 const highlighter = new WikitextHighlighter();
 const html = highlighter.highlight(wikitextString);
-container.innerHTML = html;
 ```
 
-Highlighter runs way faster for most files, however, it sucks at rerendering. Which leads us to...
-
-### WikitextEditor (experimental)
+### WikitextEditor
 
 **Incremental, live editing with DOM patching**
 
-- Extends `WikitextHighlighter` with editing capabilities
-- Caches tokenizer state and tokens per line
-- A more robust content tracking in general
-- Ideal for interactive editors, real-time preview, or large documents
+  - Caches tokenizer state and tokens per line.
+  - Handles cursor persistence and DOM synchronization.
 
 ```javascript
 import { WikitextEditor } from "wikistxr";
 
 const editor = new WikitextEditor();
-editor.attach(editableDiv); // Turns div editable and sets up event listeners
-editor.update(wikitextString); // Initial render with syntax highlighting
+editor.attach(editableDiv); 
+editor.update(wikitextString);
 ```
-
-_That being said... I still recommend using WikitextHighlighter with an actual editor like Monaco._
-
-You can find a live demo [here](https://wikistxr.t7ru.link/).
 
 ## Configuration
 
-Both classes accept the same configuration options:
+Both classes accept the same options:
 
 ```javascript
 const config = {
-  urlProtocols: /^(?:http|https|mailto)/i,
-  redirectKeywords: ["REDIRECT", "RINVIA"],
+  urlProtocols: "http|https|mailto",
+  redirectKeywords: ["REDIRECT", "WEITERLEITUNG"],
   extensionTags: ["nowiki", "ref", "gallery"],
-  contentPreservingTags: ["nowiki", "pre", "tabber"],
+  contentPreservingTags: ["nowiki", "pre"]
 };
 
 const highlighter = new WikitextHighlighter(config);
-const editor = new WikitextEditor(config);
 ```
 
-To add new styles:
+To apply default styles:
 
 ```javascript
-const styleTag = document.createElement("style");
-styleTag.textContent = WikitextEditor.getDefaultStyles();
-document.head.appendChild(styleTag);
+const styles = WikitextHighlighter.getDefaultStyles();
 ```
 
-## Demo
-
-Run the bundled demo (Vite):
+## Development
 
 ```bash
-npm install
-npm run build && npm run preview
+# Build Rust core and TypeScript bundles
+bun run build 
 
-# npm run dev only partially works,
-# since the demo uses the built dist
-# instead of src to mimic real usage.
+# Run development demo
+bun run dev
 ```
-
-Open the displayed URL to switch between **Highlighter** and **Editor** modes, load sample snippets, and verify highlighting.
-
-## Building
-
-```bash
-npm run build
-```
-
-Outputs CJS + ESM bundles under `dist/`.
 
 ## License
 
