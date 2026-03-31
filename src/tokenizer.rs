@@ -416,7 +416,15 @@ impl WikitextTokenizer {
             if rb.starts_with(b"[[") {
                 let bl = find_closing(rb, b"[[", b"]]");
                 let has_close = bl > 0;
-                let content_end = if has_close { i + bl - 2 } else { line.len() };
+                let content_end = if has_close {
+                    i + bl - 2
+                } else {
+                    i + 2
+                        + rb[2..]
+                            .iter()
+                            .position(|&b| matches!(b, b'}' | b']' | b'{' | b'['))
+                            .unwrap_or(rb.len() - 2)
+                };
 
                 emit!(u, u + 2, CLS_LINK_BR); // 2 ASCII bytes
                 u += 2;
