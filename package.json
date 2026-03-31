@@ -26,13 +26,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/t7ru/wikistxr.git"
+    "url": "git+https://github.com/t7ru/wikistxr.git"
   },
   "keywords": [
     "wikitext",
     "syntax",
     "highlight",
-    "library"
+    "wasm",
+    "webassembly"
   ],
   "author": "t7ru",
   "license": "MIT",
@@ -44,6 +45,5 @@
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.6.0"
   },
-  "homepage": "https://wikistxr.t7ru.link",
-  "private": true
+  "homepage": "https://wikistxr.t7ru.link"
 }
