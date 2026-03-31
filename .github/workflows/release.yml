@@ -48,3 +48,8 @@ jobs:
           tag_name: ${{ env.TAG }}
           body: ${{ steps.changelog.outputs.changelog }}
           make_latest: true
+
+      - name: Publish to npm
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
