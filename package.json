@@ -22,9 +22,7 @@
     "build:demo": "vite build --config vite.config.demo.ts",
     "preview": "vite preview --config vite.config.demo.ts",
     "fix-types": "mv dist/src/lib/* dist/ && rm -rf dist/src",
-    "format": "prettier . --write",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "format": "prettier . --write"
   },
   "repository": {
     "type": "git",
@@ -39,14 +37,12 @@
   "author": "t7ru",
   "license": "MIT",
   "devDependencies": {
-    "jsdom": "^29.0.1",
+    "@types/bun": "^1.3.11",
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
     "vite": "^8.0.3",
     "vite-plugin-top-level-await": "^1.6.0",
-    "vite-plugin-wasm": "^3.6.0",
-    "vitest": "^4.1.2",
-    "@types/bun": "^1.3.11"
+    "vite-plugin-wasm": "^3.6.0"
   },
   "homepage": "https://wikistxr.t7ru.link",
   "private": true

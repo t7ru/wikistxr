@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "bun:test";
 import { WikitextTokenizer } from "../src/lib/tokenizer";
 import {
   DEFAULT_CONTENT_PRESERVING_TAGS,

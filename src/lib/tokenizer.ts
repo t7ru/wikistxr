@@ -2,7 +2,9 @@
  * Optimized WikitextTokenizer for parsing wikitext into tokens.
  * Batches consecutive text and leverages WebAssembly for high-performance extraction.
  */
-import { WikitextTokenizer as WasmTokenizer } from "../../wasm/wikistxr.js";
+import initWasm, {
+  WikitextTokenizer as WasmTokenizer,
+} from "../../wasm/wikistxr.js";
 import { HighlightToken } from "./types";
 import {
   DEFAULT_REDIRECT_KEYWORDS,
@@ -10,6 +12,8 @@ import {
   DEFAULT_CONTENT_PRESERVING_TAGS,
   DEFAULT_URL_PROTOCOLS,
 } from "./constants";
+
+await initWasm();
 
 const CLASS_MAP = [
   "", // CLS_TEXT
