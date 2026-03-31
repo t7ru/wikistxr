@@ -174,7 +174,7 @@ export class WikitextEditor extends WikitextHighlighter {
 
     this.debugEmit(() => ({
       type: "attach",
-      contentEditable: String(this.container.contentEditable),
+      contentEditable: String(this.container!.contentEditable),
     }));
 
     this.inputHandler = (event: Event) => {
@@ -657,8 +657,8 @@ export class WikitextEditor extends WikitextHighlighter {
     if (!this.container) return [];
     this.debugEmit(() => ({
       type: "extractLines:start",
-      containerChildCount: this.container.childNodes.length,
-      containerTextContentLength: (this.container.textContent ?? "").length,
+      containerChildCount: this.container!.childNodes.length,
+      containerTextContentLength: (this.container!.textContent ?? "").length,
     }));
 
     const lines: string[] = [];
