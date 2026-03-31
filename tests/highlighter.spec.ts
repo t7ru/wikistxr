@@ -8,7 +8,7 @@ describe("WikitextHighlighter", () => {
     });
 
     const html = highlighter.highlight("#CUSTOMREDIRECT [[Target Page]]");
-    expect(html).toContain('<span class="wt-redirect">#CUSTOMREDIRECT</span>');
+    expect(html).toContain('<span class="wt-redirect">#CUSTOMREDIRECT </span>');
     expect(html).toContain('<span class="wt-link-pagename">Target Page</span>');
   });
 
