@@ -1,4 +1,4 @@
-import type { HighlightToken, HighlightConfig } from "./types";
+import type { HighlightToken } from "./types";
 import { WikitextHighlighter } from "./highlighter";
 
 const initialState = 0;
