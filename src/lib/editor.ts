@@ -461,8 +461,12 @@ export class WikitextEditor extends WikitextHighlighter {
         lines[i] === this.lastLines[i] &&
         this.cachedStates[i + 1] === currentState
       ) {
-        newTokens.push(...this.cachedTokens.slice(i + 1));
-        newStates.push(...this.cachedStates.slice(i + 2));
+        for (let j = i + 1; j < this.cachedTokens.length; j++) {
+          newTokens.push(this.cachedTokens[j]);
+        }
+        for (let j = i + 2; j < this.cachedStates.length; j++) {
+          newStates.push(this.cachedStates[j]);
+        }
         converged = true;
       }
 
