@@ -4,7 +4,7 @@ import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
-  root: "src/demo",
+  root: "demo",
   plugins: [wasm(), topLevelAwait()],
   resolve: {
     alias: {
@@ -12,6 +12,6 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../../dist/demo",
+    outDir: "../dist/demo",
   },
 });

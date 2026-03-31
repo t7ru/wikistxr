@@ -1,4 +1,4 @@
-<div align="center"><img src="https://raw.githubusercontent.com/t7ru/wikistxr/refs/heads/main/src/demo/logo.png" width="222" alt="wikistxr logo">
+<div align="center"><img src="https://raw.githubusercontent.com/t7ru/wikistxr/refs/heads/main/demo/logo.png" width="222" alt="wikistxr logo">
 
 # wikistxr</div>
 

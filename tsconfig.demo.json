@@ -6,5 +6,5 @@
       "wikistxr": ["./dist/index.js"],
     },
   },
-  "include": ["src/demo/**/*"],
+  "include": ["demo/**/*"],
 }
