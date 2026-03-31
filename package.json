@@ -17,12 +17,12 @@
   },
   "scripts": {
     "dev": "vite --config vite.config.demo.ts",
-    "build:wasm": "./build.sh",
-    "build": "bun run build:wasm && vite build --config vite.config.ts && tsc --project tsconfig.json && bun run fix-types",
     "build:demo": "vite build --config vite.config.demo.ts",
-    "preview": "vite preview --config vite.config.demo.ts",
-    "fix-types": "mv dist/src/lib/* dist/ && rm -rf dist/src",
-    "format": "prettier . --write"
+    "build": "bun run build:wasm && bun run build:vite && bun run build:types && bun run copy:wasm",
+    "build:wasm": "./build.sh",
+    "build:vite": "vite build --config vite.config.ts",
+    "build:types": "tsc --project tsconfig.json",
+    "copy:wasm": "cp wasm/*.wasm wasm/*.js wasm/*.d.ts dist/ 2>/dev/null || true"
   },
   "repository": {
     "type": "git",
@@ -42,8 +42,7 @@
     "prettier": "^3.8.1",
     "typescript": "^6.0.2",
     "vite": "^8.0.3",
-    "vite-plugin-top-level-await": "^1.6.0",
-    "vite-plugin-wasm": "^3.6.0"
+    "vite-plugin-top-level-await": "^1.6.0"
   },
   "homepage": "https://wikistxr.t7ru.link"
 }

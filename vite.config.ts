@@ -1,10 +1,9 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
-import wasm from "vite-plugin-wasm";
 import topLevelAwait from "vite-plugin-top-level-await";
 
 export default defineConfig({
-  plugins: [wasm(), topLevelAwait()],
+  plugins: [topLevelAwait()],
   build: {
     lib: {
       entry: resolve(__dirname, "src/lib/index.ts"),
@@ -14,7 +13,7 @@ export default defineConfig({
     },
     outDir: "dist",
     emptyOutDir: true,
-    sourcemap: true,
+    sourcemap: false,
   },
   assetsInclude: ["**/*.wasm"],
 });
