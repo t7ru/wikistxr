@@ -77,7 +77,7 @@ export class WikitextTokenizer {
       typeof urlProtocols === "string" ? urlProtocols : urlProtocols.source;
 
     safeUrlProtos = safeUrlProtos
-      .replace(/\(\?[=!<].*?\)/g, "")
+      .replace(/\(\?[=!<][^()]*\)/g, "")
       .replace(/^\^/, "")
       .replace(/\\\//g, "/");
 
