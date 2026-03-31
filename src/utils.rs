@@ -10,7 +10,7 @@ pub(crate) fn u16len(s: &str) -> u32 {
     s.chars().fold(0u32, |n, c| n + c.len_utf16() as u32)
 }
 
-/// Balanced-delimiter scan
+/// Find matching blocks
 ///
 /// Returns byte length of the full `open...close` block,
 /// or 0 if the input ends before the delimiters balance.
