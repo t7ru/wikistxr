@@ -376,31 +376,33 @@ export class WikitextEditor extends WikitextHighlighter {
       });
 
       const htmlLines = this.computeLines(lines);
-      const fragment = document.createDocumentFragment();
 
       for (let i = 0; i < lines.length; i++) {
-        const lineEl = this.lineElements[i] ?? document.createElement("div");
-        if (lineEl.className !== "wt-line") lineEl.className = "wt-line";
+        let lineEl = this.lineElements[i];
+
+        if (!lineEl) {
+          lineEl = document.createElement("div");
+          lineEl.className = "wt-line";
+          this.lineElements[i] = lineEl;
+          this.container.appendChild(lineEl);
+        } else if (lineEl.className !== "wt-line") {
+          lineEl.className = "wt-line";
+        }
 
         const html = htmlLines[i] ?? "";
         const safeHtml = html === "" ? EMPTY_PLACEHOLDER_HTML : html;
-        if (lineEl.innerHTML !== safeHtml) lineEl.innerHTML = safeHtml;
 
-        this.debugEmit({
-          type: "update:domPatch",
-          lineIndex: i,
-          reusedExistingElement: !!this.lineElements[i],
-          innerHtmlChanged: lineEl.innerHTML !== safeHtml,
-          htmlLength: html.length,
-          safeHtmlWasPlaceholder: html === "",
-        });
+        if (lineEl.innerHTML !== safeHtml) {
+          lineEl.innerHTML = safeHtml;
+        }
+      }
 
-        this.lineElements[i] = lineEl;
-        fragment.appendChild(lineEl);
+      while (this.lineElements.length > lines.length) {
+        const el = this.lineElements.pop();
+        if (el) el.remove();
       }
 
       this.lineElements.length = lines.length;
-      this.container.replaceChildren(fragment);
       if (cursorOffsetOverride !== null)
         this.restoreCursorOffset(cursorOffsetOverride);
     } finally {
