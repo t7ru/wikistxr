@@ -1,9 +1,13 @@
 <div align="center">
 <img src="https://raw.githubusercontent.com/t7ru/wikistxr/refs/heads/master/demo/logo.png" width="222" alt="wikistxr logo">
 
-# wikistxr</div>
+# wikistxr
 
 A blazingly fast library for **Wiki**text that has a **s**yn**t**a**x** highligh**ter** and edi**tor** written in Rust and TypeScript.
+
+[![](https://data.jsdelivr.com/v1/package/npm/wikistxr/badge)](https://www.jsdelivr.com/package/npm/wikistxr)
+
+</div>
 
 ## Neat Little Facts About It
 
