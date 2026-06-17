@@ -24,6 +24,8 @@ npm i wikistxr
 
 ## Usage
 
+Await `ready` before constructing classes.
+
 ### WikitextHighlighter
 
 **Static, full-pass syntax highlighting**
@@ -32,7 +34,9 @@ npm i wikistxr
 - Renders to HTML strings.
 
 ```javascript
-import { WikitextHighlighter } from "wikistxr";
+import { ready, WikitextHighlighter } from "wikistxr";
+
+await ready;
 
 const highlighter = new WikitextHighlighter();
 const html = highlighter.highlight(wikitextString);
@@ -46,7 +50,9 @@ const html = highlighter.highlight(wikitextString);
 - Handles cursor persistence and DOM synchronization.
 
 ```javascript
-import { WikitextEditor } from "wikistxr";
+import { ready, WikitextEditor } from "wikistxr";
+
+await ready;
 
 const editor = new WikitextEditor();
 editor.attach(editableDiv);

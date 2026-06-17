@@ -12,6 +12,8 @@ import {
   DEFAULT_STYLES,
 } from "./constants";
 
+export declare const ready: Promise<void>;
+
 export {
   WikitextHighlighter,
   WikitextEditor,
